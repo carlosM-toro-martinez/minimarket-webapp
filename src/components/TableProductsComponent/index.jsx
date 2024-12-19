@@ -14,6 +14,7 @@ import MenuItem from "@mui/material/MenuItem";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import TextField from "@mui/material/TextField";
 import EnhancedTableHead from "./EnhancedTableHead";
 import ModalUpdateProduct from "./ModalUpdateProduct";
 import ModalViewProduct from "./ModalViewProduct";
@@ -26,6 +27,7 @@ export default function TableProductsComponent({ productos, refetchProducts }) {
   const classes = useStyles();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [searchQuery, setSearchQuery] = useState(""); // Estado para búsqueda
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
@@ -51,7 +53,17 @@ export default function TableProductsComponent({ productos, refetchProducts }) {
     setPage(0);
   };
 
-  const visibleRows = productos.slice(
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+    setPage(0); // Reinicia la paginación al cambiar la búsqueda
+  };
+
+  // Filtrar productos según el texto de búsqueda
+  const filteredProducts = productos.filter((producto) =>
+    producto.nombre?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const visibleRows = filteredProducts.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
@@ -80,6 +92,16 @@ export default function TableProductsComponent({ productos, refetchProducts }) {
   return (
     <Box className={classes.root}>
       <Paper className={classes.paper}>
+        {/* Campo de búsqueda */}
+        <Box sx={{ padding: 2 }}>
+          <TextField
+            label="Buscar producto"
+            variant="outlined"
+            fullWidth
+            value={searchQuery}
+            onChange={handleSearchChange}
+          />
+        </Box>
         <TableContainer>
           <Table aria-labelledby="tableTitle" size="medium">
             <EnhancedTableHead />
@@ -183,7 +205,7 @@ export default function TableProductsComponent({ productos, refetchProducts }) {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={productos.length}
+          count={filteredProducts.length} // Cambiar a los productos filtrados
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
@@ -212,10 +234,3 @@ export default function TableProductsComponent({ productos, refetchProducts }) {
 TableProductsComponent.propTypes = {
   productos: PropTypes.array.isRequired,
 };
-
-{
-  /* <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="acortar"
-      /> */
-}

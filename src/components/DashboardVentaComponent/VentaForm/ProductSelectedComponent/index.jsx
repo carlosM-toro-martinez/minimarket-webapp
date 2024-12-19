@@ -149,59 +149,73 @@ const ProductSelectedComponent = ({
 
   return (
     <TableContainer component={Paper}>
-      <Table>
+      <TableRow sx={{ width: '100%', display: 'flex' }}>
+        <TableCell
+          sx={{
+            fontWeight: "bold",
+            color: "#000",
+            fontSize: "1.2rem",
+            textTransform: "capitalize",
+            display: 'flex',
+            flex: 1, // Esto hace que cada TableCell ocupe el mismo espacio
+            justifyContent: 'center', // Esto centra el contenido de la celda
+          }}
+          colSpan={2}
+        >
+          <ClienteAutocompleteComponent
+            clientes={clientes}
+            ventaData={ventaData}
+            setCliente={setCliente}
+            handleOpenClientModal={handleOpenClientModal}
+            productosSeleccionados={productosSeleccionados}
+          />
+        </TableCell>
+        <TableCell
+          sx={{
+            fontWeight: "bold",
+            color: "#000",
+            fontSize: "1.2rem",
+            display: 'flex',
+            flex: 1, // Para asegurar que la celda se expanda igualmente
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          colSpan={2}
+        >
+          <MetodoPagoComponent
+            metodoPago={metodoPago}
+            setMetodoPago={setMetodoPago}
+          />
+        </TableCell>
+        <TableCell
+          sx={{
+            fontWeight: "bold",
+            color: "#000",
+            fontSize: "1.2rem",
+            display: 'flex',
+            flex: 1, // Para que se ajuste el tamaño de la celda
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          colSpan={2}
+        >
+          <ProductoAutocompleteComponent
+            productosUnicosFiltrados={productosUnicosFiltrados}
+            ventaData={ventaData}
+            handleProductoChange={handleProductoChange}
+            setCantidad={setCantidad}
+            setCantidadPorUnidad={setCantidadPorUnidad}
+          />
+        </TableCell>
+      </TableRow>
+
+      <Table style={{
+        maxHeight: "70vh", 
+        overflowY: "auto",
+        display: 'block'
+      }}>
         <TableHead>
-          <TableRow>
-            <TableCell
-              sx={{
-                fontWeight: "bold",
-                color: "#000",
-                fontSize: "1.2rem",
-                textTransform: "capitalize",
-              }}
-              colSpan={2}
-            >
-              <ClienteAutocompleteComponent
-                clientes={clientes}
-                ventaData={ventaData}
-                setCliente={setCliente}
-                handleOpenClientModal={handleOpenClientModal}
-                productosSeleccionados={productosSeleccionados}
-              />
-            </TableCell>
-            <TableCell
-              sx={{
-                fontWeight: "bold",
-                color: "#000",
-                fontSize: "1.2rem",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-              colSpan={2}
-            >
-              <MetodoPagoComponent
-                metodoPago={metodoPago}
-                setMetodoPago={setMetodoPago}
-              />
-            </TableCell>
-            <TableCell
-              sx={{
-                fontWeight: "bold",
-                color: "#000",
-                fontSize: "1.2rem",
-                alignItems: "center",
-              }}
-              colSpan={2}
-            >
-              <ProductoAutocompleteComponent
-                productosUnicosFiltrados={productosUnicosFiltrados}
-                ventaData={ventaData}
-                handleProductoChange={handleProductoChange}
-                setCantidad={setCantidad}
-                setCantidadPorUnidad={setCantidadPorUnidad}
-              />
-            </TableCell>
-          </TableRow>
           <TableRow
             className={classes.tableHeader}
             sx={{ backgroundColor: "#3d97ef" }}
@@ -228,10 +242,13 @@ const ProductSelectedComponent = ({
             ))}
           </TableRow>
         </TableHead>
-        <TableBody>
+        <TableBody >
           {Array.isArray(productosDetallados) &&
             productosDetallados?.length > 0 &&
-            productosDetallados?.map((producto, index) => {
+            productosDetallados
+            ?.slice()
+            .reverse()
+            .map((producto, index) => {
               const {
                 cantLimit,
                 cantUnitLimit,
@@ -457,7 +474,9 @@ const ProductSelectedComponent = ({
                 </TableRow>
               );
             })}
-          <TableRow>
+        </TableBody>
+      </Table>
+      <TableRow>
             <TableCell
               sx={{ fontWeight: "bold", fontSize: "2rem" }}
               colSpan={1}
@@ -485,9 +504,7 @@ const ProductSelectedComponent = ({
                 Cancelar
               </Button>
             </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+      </TableRow>
     </TableContainer>
   );
 };

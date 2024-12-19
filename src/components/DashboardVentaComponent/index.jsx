@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Button, Grid, Box, Snackbar, Typography } from "@mui/material";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { Button, Grid, Box, Snackbar, Typography, IconButton } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import { useMutation } from "react-query";
 import DenominacionForm from "./DenominacionForm";
@@ -11,6 +11,9 @@ import { getLocalDateTime } from "../../utils/getDate";
 import ventaAddService from "../../async/services/post/ventaAddService";
 import ventaDetalleAddService from "../../async/services/post/ventaDetalleAddService";
 import { MainContext } from "../../context/MainContext";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+
 
 function DashboardVentaComponent({
   products,
@@ -20,6 +23,26 @@ function DashboardVentaComponent({
   caja,
   refetchCaja,
 }) {
+  const ventaFormRef = useRef(null);
+  const denominacionFormRef = useRef(null);
+
+  const scrollToVentaForm = () => {
+    ventaFormRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const scrollToDenominacionForm = () => {
+    const element = denominacionFormRef.current;
+    if (element) {
+      const offset = 100; 
+      const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+      const offsetPosition = elementPosition - offset;
+  
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth",
+      });
+    }
+  };
   const classes = useStyles();
   const { user } = useContext(MainContext);
 
@@ -69,6 +92,7 @@ function DashboardVentaComponent({
     cantidadPorUnidad,
     cantidad
   ) => {
+
     setProductosSeleccionados((prev) => {
       return [
         ...prev,
@@ -449,8 +473,39 @@ function DashboardVentaComponent({
       >
         Registrar Venta
       </Typography>
+      <IconButton
+        onClick={scrollToVentaForm}
+        style={{
+          position: "fixed",
+          top: "12%",
+          left: "16px",
+          transform: "translateX(120%)",
+          zIndex: 10000000,
+          fontSize: "64px",
+          backgroundColor: "rgba(25, 118, 210, 0.8)",
+          color: "#fff",
+        }}
+      >
+        <ArrowBackIcon style={{ fontSize: "64px" }} />
+      </IconButton>
+
+      <IconButton
+        onClick={scrollToDenominacionForm}
+        style={{
+          position: "fixed",
+          top: "19%",
+          right: "16px",
+          transform: "translateY(-50%)",
+          zIndex: 1000,
+          fontSize: "64px",
+          backgroundColor: "rgba(25, 118, 210, 0.8)",
+          color: "#fff",
+        }}
+      >
+        <ArrowForwardIcon style={{ fontSize: "64px" }} />
+      </IconButton>
       <Grid container spacing={1}>
-        <Grid item xs={11} md={12}>
+        <Grid item xs={11} md={12} ref={ventaFormRef}>
           <VentaForm
             ventaData={ventaData}
             clientes={clients}
@@ -493,6 +548,7 @@ function DashboardVentaComponent({
           />
         </Grid> */}
         {Array.isArray(caja?.denominaciones) && (
+          <Grid item xs={11} md={12} ref={denominacionFormRef}>
           <DenominacionForm
             caja={caja}
             refetchCaja={refetchCaja}
@@ -501,6 +557,7 @@ function DashboardVentaComponent({
             totalPrice={totalPrice}
             setRestoreDenom={setRestoreDenom}
           />
+           </Grid>
         )}
       </Grid>
       <Box

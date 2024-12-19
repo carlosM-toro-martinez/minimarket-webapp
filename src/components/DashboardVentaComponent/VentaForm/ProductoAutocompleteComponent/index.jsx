@@ -8,24 +8,27 @@ const ProductoAutocompleteComponent = ({
   setCantidadPorUnidad,
 }) => {
   const [inputValue, setInputValue] = useState("");
-  const [selectedValue, setSelectedValue] = useState(null); // Controla el valor seleccionado
+  const [selectedValue, setSelectedValue] = useState(null);
 
   const handleInputChange = (event, newInputValue) => {
     setInputValue(newInputValue);
+  };
 
-    // Busca si el código de barras coincide exactamente con algún producto
-    const matchedProduct = productosUnicosFiltrados.find(
-      (producto) =>
-        producto.codigo_barra &&
-        producto.codigo_barra.toLowerCase() === newInputValue.toLowerCase()
-    );
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      const matchedProduct = productosUnicosFiltrados.find(
+        (producto) =>
+          producto.codigo_barra &&
+          producto.codigo_barra.toLowerCase() === inputValue.toLowerCase()
+      );
 
-    if (matchedProduct) {
-      handleProductoChange(matchedProduct.id_producto, matchedProduct);
-      setCantidad();
-      setCantidadPorUnidad();
-      setInputValue(""); // Limpia el campo de entrada
-      setSelectedValue(null); // Restablece el valor seleccionado
+      if (matchedProduct) {
+        handleProductoChange(matchedProduct.id_producto, matchedProduct);
+        setCantidad();
+        setCantidadPorUnidad();
+        setInputValue("");
+        setSelectedValue(null);
+      }
     }
   };
 
@@ -34,15 +37,15 @@ const ProductoAutocompleteComponent = ({
       <Autocomplete
         options={productosUnicosFiltrados || []}
         getOptionLabel={(producto) => producto.nombre || ""}
-        value={selectedValue} // Usa el estado para controlar el valor seleccionado
+        value={selectedValue}
         onChange={(event, newValue) => {
           if (newValue) {
             handleProductoChange(newValue.id_producto, newValue);
             setCantidad();
             setCantidadPorUnidad();
           }
-          setInputValue(""); // Limpia el campo de entrada
-          setSelectedValue(null); // Restablece el valor seleccionado
+          setInputValue("");
+          setSelectedValue(null);
         }}
         inputValue={inputValue}
         onInputChange={handleInputChange}
@@ -58,7 +61,13 @@ const ProductoAutocompleteComponent = ({
                 .includes(inputValue.toLowerCase())
           )
         }
-        renderInput={(params) => <TextField {...params} label="Producto" />}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Producto"
+            onKeyDown={handleKeyDown} // Agregar el manejador de teclado aquí
+          />
+        )}
       />
     </FormControl>
   );

@@ -22,7 +22,7 @@ import WavingHandIcon from "@mui/icons-material/WavingHand";
 import FooterComponent from "./FooterComponent";
 
 export default function DrawerComponent({ children }) {
-  const { open, setOpen } = useContext(MainContext);
+  const { open, setOpen, user } = useContext(MainContext);
 
   const classes = useStyles({ open });
   const location = useLocation();
@@ -228,7 +228,7 @@ export default function DrawerComponent({ children }) {
           backgroundColor: "#f9fafc",
         }}
       >
-        <NavBarComponent handleDrawerOpen={handleDrawerOpen} open={open} />
+        <NavBarComponent user={user} handleDrawerOpen={handleDrawerOpen} open={open} />
         {children}
         <FooterComponent />
       </Box>

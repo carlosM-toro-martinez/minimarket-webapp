@@ -218,23 +218,6 @@ const VentaForm = ({
             </Grid>
           )}
 
-          {/* {pesoLimit > 0 && (
-            <Grid item xs={12} sm={6}>
-              <TextField
-                id="outlined-number"
-                label="Precio"
-                type="number"
-                value={precio}
-                onChange={(e) => setPrecio(e.target.value)}
-                slotProps={{
-                  inputLabel: {
-                    shrink: true,
-                  },
-                }}
-                fullWidth
-              />
-            </Grid>
-          )} */}
         </Grid>
       </form>
       <ProductSelectedComponent
