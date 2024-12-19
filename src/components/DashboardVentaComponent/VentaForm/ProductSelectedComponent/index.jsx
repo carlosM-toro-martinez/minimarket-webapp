@@ -246,9 +246,7 @@ const ProductSelectedComponent = ({
           {Array.isArray(productosDetallados) &&
             productosDetallados?.length > 0 &&
             productosDetallados
-            ?.slice()
-            .reverse()
-            .map((producto, index) => {
+            ?.map((producto, index) => {
               const {
                 cantLimit,
                 cantUnitLimit,

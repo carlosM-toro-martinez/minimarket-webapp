@@ -91,7 +91,6 @@ const VentaForm = ({
       });
 
       setProductosDetallados((prev) => [
-        ...prev,
         {
           productoId,
           newValue,
@@ -130,6 +129,7 @@ const VentaForm = ({
               ? 1
               : null,
         },
+        ...prev,
       ]);
       handleLoteChange(loteMasAntiguo?.lote?.id_lote, lotesFiltrados);
       setCantLote(loteMasAntiguo);
