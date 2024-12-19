@@ -1,21 +1,12 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   Box,
   Divider,
   Drawer,
-  IconButton,
   List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
   Typography,
   useTheme,
 } from "@mui/material";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import MenuIcon from "@mui/icons-material/Menu";
-import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import HomeIcon from "@mui/icons-material/Home";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
@@ -25,122 +16,208 @@ import PersonIcon from "@mui/icons-material/Person";
 import GroupIcon from "@mui/icons-material/Group";
 import useStyles from "./drawer.styles";
 import { Link, useLocation } from "react-router-dom";
+import { MainContext } from "../../context/MainContext";
+import NavBarComponent from "./NavBarComponent";
+import WavingHandIcon from "@mui/icons-material/WavingHand";
+import FooterComponent from "./FooterComponent";
 
 export default function DrawerComponent({ children }) {
-  const [open, setOpen] = useState(false);
+  const { open, setOpen } = useContext(MainContext);
+
   const classes = useStyles({ open });
   const location = useLocation();
-  const theme = useTheme();
 
   const handleDrawerOpen = () => setOpen(!open);
 
   const routes = [
-    { path: "/", name: "Inicio", icon: <HomeIcon /> },
-    { path: "/ventas", name: "Ventas", icon: <ShoppingCartIcon /> },
+    {
+      path: "/",
+      name: "Inicio",
+      icon: <HomeIcon sx={{ color: "#fff" }} />,
+    },
+    {
+      path: "/ventas",
+      name: "Ventas",
+      icon: <ShoppingCartIcon sx={{ color: "#fff" }} />,
+    },
     // { path: "/compras", name: "Compras", icon: <ShoppingCartIcon /> },
     {
       path: "/movimiento-caja",
-      name: "Movimiento de Caja",
-      icon: <AttachMoneyIcon />,
+      name: "Caja",
+      icon: <AttachMoneyIcon sx={{ color: "#fff" }} />,
     },
-    { path: "/reportes", name: "Reportes", icon: <ReportIcon /> },
-    { path: "/almacenes", name: "Almacenes", icon: <StoreIcon /> },
-    { path: "/perfil", name: "Perfil", icon: <PersonIcon /> },
-    { path: "/trabajadores", name: "Trabajadores", icon: <GroupIcon /> },
+    {
+      path: "/reportes",
+      name: "Reportes",
+      icon: <ReportIcon sx={{ color: "#fff" }} />,
+    },
+    {
+      path: "/almacenes",
+      name: "Almacenes",
+      icon: <StoreIcon sx={{ color: "#fff" }} />,
+    },
+    {
+      path: "/clientes",
+      name: "Clientes",
+      icon: <PersonIcon sx={{ color: "#fff" }} />,
+    },
+    {
+      path: "/trabajadores",
+      name: "Trabajadores",
+      icon: <GroupIcon sx={{ color: "#fff" }} />,
+    },
   ];
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "row" }}>
+    <Box
+      sx={{ display: "flex", flexDirection: "row", backgroundColor: "#f9fafc" }}
+    >
       <Drawer
         variant="permanent"
         className={open ? classes.drawerOpen : classes.drawerClose}
         classes={{
           paper: open ? classes.drawerOpen : classes.drawerClose,
         }}
+        sx={{
+          "& .MuiDrawer-paper": {
+            backgroundColor: "#1f1f21",
+            color: "white",
+            margin: ".2rem",
+            borderRadius: "1rem",
+          },
+        }}
       >
-        <div className={classes.drawerHeader}>
-          <aside className={classes.aside}>
-            <div className={classes.profile}>
-              {/* <img
-                src="https://placehold.co/50x50"
-                alt="Profile Picture"
-                className={classes.profileImg}
-              /> */}
-              <div>
-                <h2
-                  className={classes.profileNameInitial}
-                  style={{ display: open ? "none" : "block" }}
-                >
-                  K
-                </h2>
-                <h2
-                  className={classes.profileName}
-                  style={{ display: open ? "block" : "none" }}
-                >
-                  Kacie Miller
-                </h2>
-                <p
-                  className={classes.profileJob}
-                  style={{ display: open ? "block" : "none" }}
-                >
-                  Principal Applications Officer
-                </p>
-              </div>
-            </div>
-          </aside>
-        </div>
-        <Divider />
+        <Box className={classes.drawerHeader}>
+          <Typography
+            variant="h1"
+            style={{
+              textAlign: "center",
+              fontSize: "2rem",
+              margin: "1rem 0 1rem 0",
+              fontWeight: "bold",
+            }}
+          >
+            {open ? "Bienvenido" : <WavingHandIcon />}
+          </Typography>
+        </Box>
+        <Divider sx={{ backgroundColor: "#c0c0c0" }} />
         <List>
-          {routes.slice(0, 6).map(({ path, name, icon }) => (
-            <ListItem key={path} disablePadding sx={{ display: "block" }}>
-              <ListItemButton
-                component={Link}
+          {routes.slice(0, 7).map(({ path, name, icon }) => (
+            <Box key={path} style={{ padding: "8px", display: "block" }}>
+              <Link
                 to={path}
                 style={{
-                  backgroundColor: location.pathname === path ? "red" : "",
+                  display: "flex",
+                  justifyContent: open ? "flex-start" : "center",
+                  alignItems: "center",
+                  textDecoration: "none",
+                  backgroundColor:
+                    path === "/"
+                      ? location.pathname === path
+                        ? "#3d97ef"
+                        : ""
+                      : location.pathname.includes(path)
+                      ? "#3d97ef"
+                      : "",
+                  color: "white",
+                  padding: "10px 10px 10px 20px",
+                  borderRadius: "4px",
                 }}
               >
-                <ListItemIcon className={classes.listItemIcon}>
-                  {icon}
-                </ListItemIcon>
-                <ListItemText
-                  primary={name}
-                  className={classes.listItemText}
-                  style={{ display: open ? "block" : "none" }}
-                />
-              </ListItemButton>
-            </ListItem>
+                <Box
+                  sx={{
+                    display: "flex",
+                  }}
+                >
+                  <span
+                    style={{
+                      marginRight: "8px",
+                      color: "white",
+                      fontWeight: "bold",
+                      fontSize: "16px",
+                    }}
+                  >
+                    {icon}
+                  </span>
+                  <Typography
+                    variant="button"
+                    gutterBottom
+                    style={{
+                      display: open ? "block" : "none",
+                      color: "white",
+                      fontWeight: "bold",
+                      fontSize: "16px",
+                    }}
+                  >
+                    {name}
+                  </Typography>
+                </Box>
+              </Link>
+            </Box>
           ))}
         </List>
-        <Divider />
-        <List
+        {/* <Divider sx={{ backgroundColor: "#c0c0c0" }} /> */}
+        {/* <List
           style={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
           }}
         >
-          {routes.slice(6).map(({ path, name, icon }) => (
-            <ListItem key={path} disablePadding sx={{ display: "block" }}>
-              <ListItemButton
-                component={Link}
+          {routes.slice(7).map(({ path, name, icon }) => (
+            <Box key={path} style={{ padding: "8px", display: "block" }}>
+              <Link
                 to={path}
-                className={
-                  location.pathname === path ? classes.activeButton : ""
-                }
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textDecoration: "none",
+                  backgroundColor:
+                    path === "/"
+                      ? location.pathname === path
+                        ? "#3d97ef"
+                        : ""
+                      : location.pathname.includes(path)
+                      ? "#3d97ef"
+                      : "",
+                  color: "white",
+                  padding: "10px",
+                  borderRadius: "4px",
+                }}
               >
-                <ListItemIcon className={classes.listItemIcon}>
-                  {icon}
-                </ListItemIcon>
-                <ListItemText
-                  primary={name}
-                  className={classes.listItemText}
-                  style={{ display: open ? "block" : "none" }}
-                />
-              </ListItemButton>
-            </ListItem>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    width: "85%",
+                  }}
+                >
+                  <span
+                    style={{
+                      marginRight: "8px",
+                      color: "white",
+                      fontWeight: "bold",
+                      fontSize: "16px",
+                    }}
+                  >
+                    {icon}
+                  </span>
+                  <span
+                    style={{
+                      display: open ? "block" : "none",
+                      color: "white",
+                      fontWeight: "bold",
+                      fontSize: "16px",
+                    }}
+                  >
+                    {name}
+                  </span>
+                </Box>
+              </Link>
+            </Box>
           ))}
-        </List>
+        </List> */}
       </Drawer>
       <Box
         component="main"
@@ -151,15 +228,9 @@ export default function DrawerComponent({ children }) {
           backgroundColor: "#f9fafc",
         }}
       >
-        <IconButton
-          color="inherit"
-          aria-label="open drawer"
-          onClick={handleDrawerOpen}
-          edge="start"
-        >
-          {open ? <MenuOpenIcon /> : <MenuIcon />}
-        </IconButton>
+        <NavBarComponent handleDrawerOpen={handleDrawerOpen} open={open} />
         {children}
+        <FooterComponent />
       </Box>
     </Box>
   );

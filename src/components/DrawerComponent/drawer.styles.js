@@ -22,15 +22,11 @@ const useStyles = makeStyles(() => ({
     },
   },
   drawerHeader: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "flex-start",
     padding: "0 8px",
-    minHeight: 64,
+    minHeight: 50,
   },
   aside: {
     backgroundColor: "white",
-    //boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
     padding: "16px",
   },
   profile: {
@@ -41,6 +37,8 @@ const useStyles = makeStyles(() => ({
   profileImg: {
     borderRadius: "50%",
     marginRight: "8px",
+    width: "10rem",
+    width: (props) => (props.open ? "10rem" : "3rem"),
   },
   profileNameInitial: {
     fontSize: "2rem",
@@ -66,10 +64,6 @@ const useStyles = makeStyles(() => ({
   listItemButton: {
     minHeight: 48,
     justifyContent: "center",
-  },
-  listItemText: {
-    transition: "opacity 225ms ease-in-out",
-    display: (props) => (props.open ? "block" : "none"),
   },
   activeButton: {
     backgroundColor: "red",

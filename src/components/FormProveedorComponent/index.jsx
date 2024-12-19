@@ -12,6 +12,7 @@ function FormProveedor({ handleClose, refetchProveedores }) {
     telefono: "",
     email: "",
     direccion: "",
+    nitci: "",
   });
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -74,12 +75,21 @@ function FormProveedor({ handleClose, refetchProveedores }) {
           </Grid>
           <Grid item xs={12}>
             <TextField
+              label="NIT/CI"
+              name="nitci"
+              value={proveedor.nitci}
+              onChange={handleChange}
+              fullWidth
+              className={classes.input}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
               label="Teléfono"
               name="telefono"
               value={proveedor.telefono}
               onChange={handleChange}
               fullWidth
-              required
               className={classes.input}
             />
           </Grid>
@@ -101,7 +111,6 @@ function FormProveedor({ handleClose, refetchProveedores }) {
               value={proveedor.direccion}
               onChange={handleChange}
               fullWidth
-              required
               className={classes.input}
             />
           </Grid>

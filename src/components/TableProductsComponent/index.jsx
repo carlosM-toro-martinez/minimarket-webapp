@@ -12,12 +12,8 @@ import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add";
-import { useNavigate } from "react-router-dom";
 import EnhancedTableHead from "./EnhancedTableHead";
 import ModalUpdateProduct from "./ModalUpdateProduct";
 import ModalViewProduct from "./ModalViewProduct";
@@ -60,12 +56,6 @@ export default function TableProductsComponent({ productos, refetchProducts }) {
     page * rowsPerPage + rowsPerPage
   );
 
-  const navigate = useNavigate();
-
-  const handleButtonClick = () => {
-    navigate("/almacenes/crear");
-  };
-
   const handleOpenUpdateModal = () => {
     handleCloseMenu();
     setOpenUpdateModal(true);
@@ -96,6 +86,7 @@ export default function TableProductsComponent({ productos, refetchProducts }) {
             <TableBody>
               {visibleRows.map((row, index) => {
                 const isEvenRow = index % 2 === 0;
+
                 return (
                   <TableRow
                     hover
@@ -104,18 +95,55 @@ export default function TableProductsComponent({ productos, refetchProducts }) {
                     key={row.id_producto}
                     className={isEvenRow ? classes.evenRow : classes.oddRow}
                   >
-                    <TableCell align="left">{row.nombre || "N/A"}</TableCell>
+                    <TableCell
+                      align="left"
+                      sx={{ fontWeight: "bold", textTransform: "uppercase" }}
+                    >
+                      {row.nombre || "N/A"}
+                    </TableCell>
                     <TableCell align="left">
                       {row.codigo_barra || "N/A"}
                     </TableCell>
-                    <TableCell align="left">{row.categoria || "N/A"}</TableCell>
-                    <TableCell align="right">
-                      {row.precio !== null ? row.precio : "N/A"}
+                    <TableCell
+                      sx={{
+                        color:
+                          row.stock > 0 && row.subCantidad === 0
+                            ? "green"
+                            : row.stock > 0
+                            ? "green"
+                            : "red",
+                      }}
+                    >
+                      {row.stock > 0 && row.subCantidad === 0
+                        ? row.subCantidad
+                        : row.stock !== null
+                        ? row.stock
+                        : "N/A"}
                     </TableCell>
-                    <TableCell align="right">
-                      {row.stock !== null ? row.stock : "N/A"}
+                    <TableCell
+                      sx={{
+                        color:
+                          row.stock > 0 && row.subCantidad === 0
+                            ? "green"
+                            : row.subCantidad > 0
+                            ? "green"
+                            : "red",
+                      }}
+                    >
+                      {row.stock > 0 && row.subCantidad === 0
+                        ? row.stock
+                        : row.subCantidad !== null
+                        ? row.subCantidad
+                        : "N/A"}
                     </TableCell>
-                    <TableCell align="right">
+
+                    <TableCell sx={{ color: row.peso > 0 ? "green" : "red" }}>
+                      {row.peso !== null ? row.peso : "N/A"}
+                    </TableCell>
+                    <TableCell sx={{ color: "green", fontWeight: "bold" }}>
+                      {row.precio !== null ? `${row.precio} Bs` : "N/A"}
+                    </TableCell>
+                    <TableCell>
                       <IconButton
                         aria-label="more"
                         aria-haspopup="true"
@@ -144,9 +172,6 @@ export default function TableProductsComponent({ productos, refetchProducts }) {
                         <MenuItem onClick={() => handleOpenViewModal()}>
                           <VisibilityIcon /> Ver
                         </MenuItem>
-                        {/* <MenuItem onClick={handleDeleteProduct}>
-                          <DeleteIcon /> Eliminar
-                        </MenuItem> */}
                       </Menu>
                     </TableCell>
                   </TableRow>
@@ -163,18 +188,9 @@ export default function TableProductsComponent({ productos, refetchProducts }) {
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage="Filas por página"
         />
       </Paper>
-
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleButtonClick}
-        >
-          Crear Nueva Compra
-        </Button>
-      </div>
 
       {openUpdateModal && (
         <ModalUpdateProduct

@@ -1,24 +1,27 @@
-import React, { useEffect } from "react";
-import productosService from "../../async/services/get/productosService";
-import { useQuery } from "react-query";
-import DashboardComponent from "../../components/DashboardComponent";
-import FormProduct from "../../components/FormProductComponent";
+import React, { useContext } from "react";
 import DrawerComponent from "../../components/DrawerComponent";
-import TableProductsComponent from "../../components/TableProductsComponent";
+import DashboardCajaComponent from "../../components/DashboardCajaComponent";
+import { MainContext } from "../../context/MainContext";
+import { useQuery } from "react-query";
+import cajaService from "../../async/services/get/cajaService";
+import { CircularProgress } from "@mui/material";
 
 function MovimientoCaja() {
-  // const { data, isLoading, error, refetch } = useQuery(`sectionsProducts`, () =>
-  //   productosService()
+  const { data, isLoading, error, refetch } = useContext(MainContext);
+  // const { data, isLoading, error, refetch } = useQuery(`cajaService`, () =>
+  //   cajaService()
   // );
-  // useEffect(() => {
-  //   console.log(data);
-  // }, [isLoading]);
   return (
     <>
       <DrawerComponent>
-        {/* {!isLoading ? <TableProductsComponent productos={data} /> : null}
-        <FormProduct /> */}
-        <div>caja</div>
+        {!isLoading ? (
+          <DashboardCajaComponent
+            caja={data?.caja?.fecha_cierre ? null : data}
+            refetch={refetch}
+          />
+        ) : (
+          <CircularProgress color="inherit" />
+        )}
       </DrawerComponent>
     </>
   );

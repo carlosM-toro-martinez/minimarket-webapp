@@ -63,24 +63,64 @@ function ModalViewProduct({ handleClose, product }) {
         <Typography variant="h6">Producto: {data.producto}</Typography>
         <TableContainer component={Paper} style={{ marginTop: "1rem" }}>
           <Table>
-            <TableHead>
+            <TableHead style={{ backgroundColor: "#3d97ef" }}>
               <TableRow>
-                <TableCell>Número de Lote</TableCell>
-                <TableCell>Cantidad</TableCell>
-                <TableCell>Fecha de Caducidad</TableCell>
-                <TableCell>Fecha de Ingreso</TableCell>
+                <TableCell style={{ color: "#fff", fontWeight: "bold" }}>
+                  Número de Lote
+                </TableCell>
+                <TableCell style={{ color: "#fff", fontWeight: "bold" }}>
+                  Cantidad (c/p)
+                </TableCell>
+                <TableCell style={{ color: "#fff", fontWeight: "bold" }}>
+                  Unidades
+                </TableCell>
+                <TableCell style={{ color: "#fff", fontWeight: "bold" }}>
+                  Peso (kg)
+                </TableCell>
+                <TableCell style={{ color: "#fff", fontWeight: "bold" }}>
+                  Caducidad
+                </TableCell>
+                <TableCell style={{ color: "#fff", fontWeight: "bold" }}>
+                  Ingreso
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {data.inventarios.map((inventario, index) => (
                 <TableRow key={index}>
                   <TableCell>{inventario.numero_lote}</TableCell>
-                  <TableCell>{inventario.cantidad}</TableCell>
-                  <TableCell>
-                    {new Date(inventario.fecha_caducidad).toLocaleDateString()}
+                  <TableCell style={{ color: "green" }}>
+                    {inventario.cantidad > 0 && inventario.subCantidad === 0
+                      ? inventario.subCantidad
+                      : inventario.cantidad}
+                  </TableCell>
+                  <TableCell
+                    style={{
+                      color: "green",
+                    }}
+                  >
+                    {inventario.cantidad > 0 && inventario.subCantidad === 0
+                      ? inventario.cantidad
+                      : inventario.subCantidad}
+                  </TableCell>
+                  <TableCell
+                    style={{ color: inventario.peso > 0 ? "green" : "red" }}
+                  >
+                    {inventario.peso}
                   </TableCell>
                   <TableCell>
-                    {new Date(inventario.fecha_ingreso).toLocaleDateString()}
+                    {inventario.fecha_caducidad
+                      .split("T")[0]
+                      .split("-")
+                      .reverse()
+                      .join("/")}
+                  </TableCell>
+                  <TableCell>
+                    {inventario.fecha_ingreso
+                      .split("T")[0]
+                      .split("-")
+                      .reverse()
+                      .join("/")}
                   </TableCell>
                 </TableRow>
               ))}

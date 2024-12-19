@@ -4,7 +4,7 @@ import { useQuery } from "react-query";
 import productosService from "../../../async/services/get/productosService";
 import proveedoresService from "../../../async/services/get/proveedoresService";
 import loteService from "../../../async/services/get/loteService";
-import RegisterBuyComponent from "../../../components/FormInventoryComponent/RegisterBuyComponent";
+import RegisterBuyComponent from "../../../components/RegisterBuyComponent";
 import { Paper } from "@mui/material";
 
 function CreateAlmacenes() {
@@ -31,14 +31,6 @@ function CreateAlmacenes() {
     <>
       <DrawerComponent>
         {!isLoadingProducts && !isLoadingProveedores && !isLoadingLote ? (
-          // <FormInventoryComponent
-          //   products={productsData}
-          //   refetchProducts={refetchProducts}
-          //   proveedores={proveedoresData}
-          //   refetchProveedores={refetchProveedores}
-          //   lote={loteData}
-          //   refetchLote={refetchLote}
-          // />
           <Paper
             elevation={3}
             style={{

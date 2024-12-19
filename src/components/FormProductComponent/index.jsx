@@ -1,10 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { TextField, Button, Grid, Snackbar } from "@mui/material";
-import { useMutation } from "react-query";
+import {
+  TextField,
+  Button,
+  Grid,
+  Snackbar,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+} from "@mui/material";
+import { useMutation, useQuery } from "react-query";
 import Alert from "@mui/material/Alert";
 import useStyles from "./formProduct.styles";
 import productsAddService from "../../async/services/post/productsAddServices";
 import productoOneUpdateServices from "../../async/services/put/productoOneUpdateServices";
+import categoriasService from "../../async/services/get/categoriasService";
 
 function FormProduct({ handleClose, refetchProducts, productData }) {
   const classes = useStyles();
@@ -16,7 +26,7 @@ function FormProduct({ handleClose, refetchProducts, productData }) {
   const [product, setProduct] = useState({
     nombre: productData ? productData.nombre : "",
     codigo_barra: productData ? productData.codigo_barra : "",
-    categoria: productData ? productData.categoria : "",
+    id_categoria: productData ? productData.id_categoria : "", // Guardamos el id_categoria
     precio: productData ? productData.precio : "",
     stock: productData ? productData.stock : 0,
   });
@@ -32,7 +42,7 @@ function FormProduct({ handleClose, refetchProducts, productData }) {
       setProduct({
         nombre: productData.nombre,
         codigo_barra: productData.codigo_barra,
-        categoria: productData.categoria,
+        id_categoria: productData.id_categoria,
         precio: productData.precio,
         stock: productData.stock,
       });
@@ -50,7 +60,12 @@ function FormProduct({ handleClose, refetchProducts, productData }) {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  // Determinar la mutación basada en la existencia de productId
+  const {
+    data: categorias,
+    isLoading: isLoadingCategorias,
+    isError,
+  } = useQuery("categorias", categoriasService);
+
   const mutation = useMutation(
     productId
       ? () => productoOneUpdateServices(productId, product)
@@ -92,6 +107,7 @@ function FormProduct({ handleClose, refetchProducts, productData }) {
             <TextField
               label="Nombre"
               name="nombre"
+              variant="outlined"
               value={product.nombre}
               onChange={handleChange}
               fullWidth
@@ -103,6 +119,7 @@ function FormProduct({ handleClose, refetchProducts, productData }) {
             <TextField
               label="Código de Barras"
               name="codigo_barra"
+              variant="outlined"
               value={product.codigo_barra}
               onChange={handleChange}
               fullWidth
@@ -112,19 +129,9 @@ function FormProduct({ handleClose, refetchProducts, productData }) {
           </Grid>
           <Grid item xs={12}>
             <TextField
-              label="Categoría"
-              name="categoria"
-              value={product.categoria}
-              onChange={handleChange}
-              fullWidth
-              required
-              className={classes.input}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              label="Precio"
+              label="Precio salida de almacen"
               name="precio"
+              variant="outlined"
               value={product.precio}
               onChange={handleChange}
               fullWidth
@@ -134,6 +141,33 @@ function FormProduct({ handleClose, refetchProducts, productData }) {
               inputProps={{ step: "0.01" }}
             />
           </Grid>
+          <Grid item xs={12}>
+            <FormControl fullWidth required>
+              <InputLabel id="demo-simple-select-label">Categoría</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                name="id_categoria"
+                variant="outlined"
+                label="Categoría"
+                value={product.id_categoria}
+                onChange={handleChange}
+                className={classes.input}
+                disabled={isLoadingCategorias || isError}
+              >
+                {categorias &&
+                  categorias.map((categoria) => (
+                    <MenuItem
+                      key={categoria.id_categoria}
+                      value={categoria.id_categoria}
+                    >
+                      {categoria.nombre}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+          </Grid>
+
           {/* <Grid item xs={12}>
             <TextField
               label="Stock"

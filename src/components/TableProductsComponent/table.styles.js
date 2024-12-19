@@ -2,7 +2,7 @@ import { makeStyles } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: "100%",
+    minWidth: "50rem",
     padding: "16px",
   },
   header: {
@@ -32,8 +32,8 @@ const useStyles = makeStyles((theme) => ({
   oddRow: {
     backgroundColor: "#fff",
   },
-  tableHead: {
-    //backgroundColor: "#1976d2",
+  tableHeader: {
+    backgroundColor: "#3d97ef",
   },
   tableHeadText: {
     color: "#fff",
