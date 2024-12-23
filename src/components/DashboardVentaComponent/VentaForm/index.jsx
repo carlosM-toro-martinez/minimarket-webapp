@@ -190,7 +190,6 @@ const VentaForm = ({
   const productosUnicosFiltrados = productosUnicos.filter(
     (producto) => producto.inventarios.length > 0
   );
-  console.log(productosUnicosFiltrados);
   
 
   return (

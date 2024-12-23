@@ -92,6 +92,7 @@ function DashboardVentaComponent({
     cantidadPorUnidad,
     cantidad
   ) => {
+console.log(addProducto);
 
     setProductosSeleccionados((prev) => {
       return [
@@ -225,6 +226,7 @@ function DashboardVentaComponent({
 
     setIsProcessing(true);
     setShouldMutate(false);
+console.log(productosDetallados);
 
     for (const item of productosDetallados) {
       const producto = item.newValue;
@@ -237,6 +239,7 @@ function DashboardVentaComponent({
       const metodoSeleccionado = item.metodoSeleccionado;
       const cantidadMetodo = item.cantidadMetodo;
       const pesoMetodo = item.pesoMetodo;
+      const precioManual = item.precioManual
 
       await procesarVenta(
         producto,
@@ -248,7 +251,8 @@ function DashboardVentaComponent({
         cantidad,
         metodoSeleccionado,
         cantidadMetodo,
-        pesoMetodo
+        pesoMetodo,
+        precioManual
       );
     }
 
@@ -266,7 +270,8 @@ function DashboardVentaComponent({
     cantidad,
     metodoSeleccionado,
     cantidadMetodo,
-    pesoMetodo
+    pesoMetodo,
+    precioManual
   ) => {
     const productoSeleccionado = products.find(
       (producto) => producto.id_producto === newValue.id_producto
@@ -285,8 +290,7 @@ function DashboardVentaComponent({
       : cantidad;
 
     let priceProduct =
-      precio || productoSeleccionado?.inventarios[0]?.lote?.producto?.precio;
-    if (!precio) setPrecio(priceProduct);
+      precio || precioManual || productoSeleccionado?.inventarios[0]?.lote?.producto?.precio;
 
     const lotesOrdenados = lotesProducto.sort(
       (a, b) => a.lote.id_lote - b.lote.id_lote
@@ -376,7 +380,6 @@ function DashboardVentaComponent({
           break;
 
         case peso && !cantidadPorUnidad && !cantidad:
-          console.log(pesoMetodo);
           let precio = priceProduct;
           let pesoFinal = peso;
           if (pesoMetodo) {
@@ -456,6 +459,7 @@ function DashboardVentaComponent({
       console.log(productosSeleccionados);
       ventaMutation.mutate();
       setShouldMutate(false);
+      setPrecio();
     }
   }, [isProcessing, shouldMutate, productosSeleccionados]);
 
