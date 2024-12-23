@@ -180,7 +180,8 @@ const VentaForm = ({
     setCancelForm(() => handleCancelar);
   }, [setCancelForm]);
 
-  const productosUnicos = [
+  const 
+  productosUnicos = [
     ...new Map(
       productos.map((producto) => [producto.id_producto, producto])
     ).values(),
@@ -189,6 +190,8 @@ const VentaForm = ({
   const productosUnicosFiltrados = productosUnicos.filter(
     (producto) => producto.inventarios.length > 0
   );
+  console.log(productosUnicosFiltrados);
+  
 
   return (
     <Box sx={{ padding: 2 }}>

@@ -157,8 +157,8 @@ const ProductSelectedComponent = ({
             fontSize: "1.2rem",
             textTransform: "capitalize",
             display: 'flex',
-            flex: 1, // Esto hace que cada TableCell ocupe el mismo espacio
-            justifyContent: 'center', // Esto centra el contenido de la celda
+            flex: 1,
+            justifyContent: 'center',
           }}
           colSpan={2}
         >
