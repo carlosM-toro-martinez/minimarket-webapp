@@ -259,7 +259,7 @@ const ProductSelectedComponent = ({
                 <TableRow key={index}>
                   <TableCell>{newValue?.nombre}</TableCell>
                   <TableCell>
-                    {pesoLimit > 0 ? (
+                    {/* {pesoLimit > 0 ? (
                       <>
                         <TextField
                           label="Precio Manual"
@@ -285,7 +285,14 @@ const ProductSelectedComponent = ({
                               ?.precio}{" "}
                         Bs
                       </>
-                    )}
+                    )} */}
+                                          <>
+                        {metodoSeleccionado
+                          ? metodoSeleccionado.precio
+                          : newValue?.inventarios[0]?.lote?.producto
+                              ?.precio}{" "}
+                        Bs
+                      </>
                   </TableCell>
 
                   <TableCell>

@@ -55,11 +55,12 @@ function ModalViewProduct({ handleClose, product }) {
   if (!data) {
     return null;
   }
+  
 
   return (
-    <Dialog open={true} onClose={handleClose}>
+    <Dialog open={true} onClose={handleClose} >
       <DialogTitle>Ver Producto</DialogTitle>
-      <DialogContent>
+      <DialogContent >
         <Typography variant="h6">Producto: {data.producto}</Typography>
         <TableContainer component={Paper} style={{ marginTop: "1rem" }}>
           <Table>
@@ -82,6 +83,12 @@ function ModalViewProduct({ handleClose, product }) {
                 </TableCell>
                 <TableCell style={{ color: "#fff", fontWeight: "bold" }}>
                   Ingreso
+                </TableCell>
+                <TableCell style={{ color: "#fff", fontWeight: "bold" }}>
+                   Precio de compra
+                </TableCell>
+                <TableCell style={{ color: "#fff", fontWeight: "bold" }}>
+                  Editar precio
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -121,6 +128,12 @@ function ModalViewProduct({ handleClose, product }) {
                       .split("-")
                       .reverse()
                       .join("/")}
+                  </TableCell>
+                  <TableCell>
+                    {inventario.detalleCompra.precio_unitario}
+                  </TableCell>
+                  <TableCell>
+                    <Button >Editar</Button>
                   </TableCell>
                 </TableRow>
               ))}
