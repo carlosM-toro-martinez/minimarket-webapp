@@ -86,11 +86,11 @@ function TableClientsSalesResume() {
         const doc = new jsPDF();
         doc.text("Reporte de Ventas por Cliente", 80, 10);
         const tableData = mutation.data.map((venta) => [
-          new Date(venta.fecha_venta).toLocaleDateString(),
-          venta.metodo_pago,
-          venta.cliente?.nombre || "N/A",
-          venta.cliente?.apellido || "N/A",
-          venta.total,
+          new Date(venta?.fecha_venta).toLocaleDateString(),
+          venta?.metodo_pago,
+          venta?.cliente?.nombre || "N/A",
+          venta?.cliente?.apellido || "N/A",
+          venta?.total,
         ]);
     
         doc.autoTable({
@@ -141,11 +141,11 @@ function TableClientsSalesResume() {
                     <TableBody>
                     {mutation.data.map((venta) => (
                         <TableRow key={venta.id_venta}>
-                        <TableCell align="center">{new Date(venta.fecha_venta).toLocaleDateString()}</TableCell>
-                        <TableCell align="center">{venta.metodo_pago}</TableCell>
-                        <TableCell align="center">{venta.cliente?.nombre || "N/A"}</TableCell>
-                        <TableCell align="center">{venta.cliente?.apellido || "N/A"}</TableCell>
-                        <TableCell align="center" style={{ color: "green", fontWeight: 'bold' }}>{venta.total}</TableCell>
+                        <TableCell align="center">{new Date(venta?.fecha_venta).toLocaleDateString()}</TableCell>
+                        <TableCell align="center">{venta?.metodo_pago}</TableCell>
+                        <TableCell align="center">{venta?.cliente?.nombre || "N/A"}</TableCell>
+                        <TableCell align="center">{venta?.cliente?.apellido || "N/A"}</TableCell>
+                        <TableCell align="center" style={{ color: "green", fontWeight: 'bold' }}>{venta?.total}</TableCell>
                         </TableRow>
                     ))}
                     </TableBody>

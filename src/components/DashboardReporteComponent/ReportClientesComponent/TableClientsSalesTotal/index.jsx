@@ -88,10 +88,10 @@ function TableClientsSalesTotal() {
 
     const tableData = [
       [
-        mutation.data.totalGastado.cliente.nombre,
-        mutation.data.totalGastado.cliente.apellido,
-        mutation.data.totalGastado.cliente.codigo,
-        mutation.data.totalGastado.totalGastado
+        mutation?.data?.totalGastado?.cliente?.nombre,
+        mutation?.data?.totalGastado?.cliente?.apellido,
+        mutation?.data?.totalGastado?.cliente?.codigo,
+        mutation?.data?.totalGastado?.totalGastado
       ]
     ];
 
@@ -141,16 +141,16 @@ function TableClientsSalesTotal() {
             <TableBody>
               <TableRow>
                 <TableCell align="center">
-                  {mutation.data.totalGastado.cliente.nombre}
+                  {mutation?.data?.totalGastado?.cliente?.nombre}
                 </TableCell>
                 <TableCell align="center">
-                  {mutation.data.totalGastado.cliente.apellido}
+                  {mutation?.data?.totalGastado?.cliente?.apellido}
                 </TableCell>
                 <TableCell align="center">
-                  {mutation.data.totalGastado.cliente.codigo}
+                  {mutation?.data?.totalGastado?.cliente?.codigo}
                 </TableCell>
                 <TableCell align="center" style={{ color: "green", fontWeight: 'bold' }}>
-                  {mutation.data.totalGastado.totalGastado}
+                  {mutation?.data?.totalGastado?.totalGastado}
                 </TableCell>
               </TableRow>
             </TableBody>
