@@ -11,6 +11,8 @@ import TableClientsComponent from "./TableClientsComponent";
 import reportClientsService from "../../../async/services/get/reportClientsServices";
 import reportClientsFidelidadServices from "../../../async/services/get/reportClientsFidelidadServices";
 import TableClientesPorFidelidad from "./TableClientesPorFidelidad";
+import TableClientsSalesTotal from "./TableClientsSalesTotal";
+import TableClientsSalesResume from "./TableClientsSalesResume";
 
 function ReportClientesComponent() {
   const [selectedReport, setSelectedReport] = useState(null); // Estado para controlar qué tabla mostrar
@@ -45,8 +47,16 @@ function ReportClientesComponent() {
   };
 
   const handleGenerateReportForFidelidad = () => {
-    setSelectedReport("fidelidad"); 
+    setSelectedReport("fidelidad");
     fetchReportClients();
+  };
+
+  const handleGenerateSalesTotal = () => {
+    setSelectedReport("salesTotal");
+  };
+
+  const handleGenerateSalesResume = () => {
+    setSelectedReport("salesResume");
   };
 
   return (
@@ -82,11 +92,11 @@ function ReportClientesComponent() {
               color: selectedReport === "clientes" ? "#fff" : "#000",
             }}
           >
-            Por monto economico
+            Por monto económico
           </Button>
           <Button
             variant="contained"
-            color={selectedReport === "clientes" ? "primary" : "inherit"}
+            color={selectedReport === "fidelidad" ? "primary" : "inherit"}
             onClick={handleGenerateReportForFidelidad}
             style={{
               backgroundColor: selectedReport === "fidelidad" ? "#1976d2" : "#e0e0e0",
@@ -94,6 +104,28 @@ function ReportClientesComponent() {
             }}
           >
             Por cantidad de compras
+          </Button>
+          <Button
+            variant="contained"
+            color={selectedReport === "salesTotal" ? "primary" : "inherit"}
+            onClick={handleGenerateSalesTotal}
+            style={{
+              backgroundColor: selectedReport === "salesTotal" ? "#1976d2" : "#e0e0e0",
+              color: selectedReport === "salesTotal" ? "#fff" : "#000",
+            }}
+          >
+            Ventas Totales
+          </Button>
+          <Button
+            variant="contained"
+            color={selectedReport === "salesResume" ? "primary" : "inherit"}
+            onClick={handleGenerateSalesResume}
+            style={{
+              backgroundColor: selectedReport === "salesResume" ? "#1976d2" : "#e0e0e0",
+              color: selectedReport === "salesResume" ? "#fff" : "#000",
+            }}
+          >
+            Resumen de Ventas
           </Button>
         </Box>
 
@@ -128,6 +160,14 @@ function ReportClientesComponent() {
           ) : (
             reportDataClients && <TableClientesPorFidelidad data={reportDataClients} />
           )
+        )}
+
+        {selectedReport === "salesTotal" && (
+          <TableClientsSalesTotal />
+        )}
+
+        {selectedReport === "salesResume" && (
+          <TableClientsSalesResume />
         )}
       </Box>
     </DrawerComponent>
