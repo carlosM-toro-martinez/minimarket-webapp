@@ -226,7 +226,6 @@ console.log(addProducto);
 
     setIsProcessing(true);
     setShouldMutate(false);
-console.log(productosDetallados);
 
     for (const item of productosDetallados) {
       const producto = item.newValue;
@@ -462,6 +461,25 @@ console.log(productosDetallados);
       setPrecio();
     }
   }, [isProcessing, shouldMutate, productosSeleccionados]);
+  
+
+
+  const handleKeyDown = (event) => {
+    if (event.key === "ArrowLeft") {
+      scrollToVentaForm();
+    } else if (event.key === "ArrowRight") {
+      scrollToDenominacionForm();
+    }
+  };
+
+  useEffect(() => {
+    if (ventaFormRef.current) {
+      ventaFormRef.current.focus();
+    }
+    if (denominacionFormRef.current) {
+      denominacionFormRef.current.focus();
+    }
+  }, []);
 
   return (
     <Box style={{ minWidth: "100%" }}>
@@ -479,6 +497,7 @@ console.log(productosDetallados);
       </Typography>
       <IconButton
         onClick={scrollToVentaForm}
+        onKeyDown={handleKeyDown}
         style={{
           position: "fixed",
           top: "12%",
@@ -495,6 +514,7 @@ console.log(productosDetallados);
 
       <IconButton
         onClick={scrollToDenominacionForm}
+        onKeyDown={handleKeyDown}
         style={{
           position: "fixed",
           top: "19%",

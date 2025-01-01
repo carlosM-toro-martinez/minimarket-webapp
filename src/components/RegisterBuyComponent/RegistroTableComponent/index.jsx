@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   Table,
   TableBody,
@@ -15,6 +15,8 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 import PDFReport from "./PDFReport";
 import { MainContext } from "../../../context/MainContext";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import detalleCompraDeleteServices from "../../../async/services/delete/detalleCompraDeleteServices";
+import { useMutation } from "react-query";
 
 const RegistroTableComponent = ({
   registroCombinado,
@@ -28,22 +30,32 @@ const RegistroTableComponent = ({
 
   const prevRegistroCombinadoLength = useRef(buyLote.length);
   const navigate = useNavigate();
+  const [infoArray, setInfoArray] = useState([]);
 
   useEffect(() => {
-    if (buyLote.length > prevRegistroCombinadoLength.current) {
-      const data = buyLote[buyLote.length - 1];
-
-      const nuevoData = {
-        ...data,
-        tipo_movimiento: "compra",
-        id_trabajador: user?.id_trabajador,
-      };
-
-      productoUpdateServices(nuevoData?.producto?.id_producto, nuevoData);
-
-      prevRegistroCombinadoLength.current = buyLote.length;
-    }
-  }, [registroCombinado]);
+    const handleUpdate = async () => {
+      if (buyLote.length > prevRegistroCombinadoLength.current) {
+        const data = buyLote[buyLote.length - 1];
+  
+        const nuevoData = {
+          ...data,
+          tipo_movimiento: "compra",
+          id_trabajador: user?.id_trabajador,
+        };
+  
+        try {
+          const info = await productoUpdateServices(nuevoData?.producto?.id_producto, nuevoData);
+          setInfoArray((prevInfoArray) => [...prevInfoArray, info]);
+        } catch (error) {
+          console.error("Error al actualizar el producto:", error);
+        }
+  
+        prevRegistroCombinadoLength.current = buyLote.length;
+      }
+    };
+  
+    handleUpdate(); 
+  }, [registroCombinado, buyLote, user]);
 
   const calcularPrecioTotal = (registro, precioPeso) => {
     const precioUnitario = parseFloat(registro?.detalleCompra?.precio_unitario);
@@ -77,6 +89,39 @@ const RegistroTableComponent = ({
     handleFinalize();
     navigate("/almacenes");
   };
+
+  const mutation = useMutation(
+    ({ id_detalle, data }) => detalleCompraDeleteServices(id_detalle, data),
+    {
+      onSuccess: (_, variables) => {
+        const { index } = variables;
+        buyLote.splice(index, 1);
+        console.log('El registro se eliminó exitosamente.');
+      },
+      onError: (error) => {
+        console.error('Error al eliminar el registro:', error);
+      },
+    }
+  );
+  
+
+  const handleDelete = (index, registro) => {
+    console.log(registro);
+    console.log(infoArray);
+    
+    const data = {
+      id_detalle: registro.detalleCompra.id_detalle,
+      id_lote: registro.id_lote,
+      id_inventario: infoArray[index].inventario.id_inventario,
+      id_movimiento: infoArray[index].movimiento.id_movimiento,
+      cantidad: registro.cantidad,
+      subCantidad: registro.subCantidad,
+      peso: registro.peso,
+      id_producto: registro.producto.id_producto,
+    }
+    console.log(data);
+    mutation.mutate({ id_detalle: data.id_detalle, data, index });
+  }
 
   return (
     <Box sx={{ width: "93%" }}>
@@ -137,7 +182,7 @@ const RegistroTableComponent = ({
                   Bs
                 </TableCell>
                 <TableCell>
-                    <Button onClick={() => handleDelete(index)}>
+                    <Button onClick={() => handleDelete(index, registro)}>
                       <DeleteOutlineOutlinedIcon />
                     </Button>
                 </TableCell>
