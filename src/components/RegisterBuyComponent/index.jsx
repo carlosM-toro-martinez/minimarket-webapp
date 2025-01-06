@@ -14,6 +14,7 @@ import { useMutation, useQuery } from "react-query";
 import { getLocalDateTime } from "../../utils/getDate";
 import { MainContext } from "../../context/MainContext";
 import { Typography } from "@mui/material";
+import buyAddService from "../../async/services/post/buyAddService";
 
 const RegisterBuyComponent = ({
   products,
@@ -32,6 +33,8 @@ const RegisterBuyComponent = ({
   const [fechaCaducidad, setFechaCaducidad] = useState("");
   const [proveedor, setProveedor] = useState("");
   const [producto, setProducto] = useState("");
+  const [productoName, setProductoName] = useState("");
+  const [proveedorName, setProveedorName] = useState("");
   const [cantidad, setCantidad] = useState(null);
   const [precio, setPrecio] = useState(null);
   const [peso, setPeso] = useState(null);
@@ -60,29 +63,29 @@ const RegisterBuyComponent = ({
     setSnackbar({ ...snackbar, open: false });
   };
 
-  const { data, refetch } = useQuery(
-    ["detalle-compra", loteNumber],
-    () => (loteNumber ? buyLoteService(loteNumber) : []),
-    {
-      enabled: true,
-      onSuccess: (data) => {
-        setRegistroCombinado(data);
-      },
-      onError: (error) => {
-        setSnackbar({
-          open: true,
-          message: `Error al obtener los datos del lote: ${error.message}`,
-          severity: "error",
-        });
-      },
-    }
-  );
+  // const { data, refetch } = useQuery(
+  //   ["detalle-compra", loteNumber],
+  //   () => (loteNumber ? buyLoteService(loteNumber) : []),
+  //   {
+  //     enabled: true,
+  //     onSuccess: (data) => {
+  //       setRegistroCombinado(data);
+  //     },
+  //     onError: (error) => {
+  //       setSnackbar({
+  //         open: true,
+  //         message: `Error al obtener los datos del lote: ${error.message}`,
+  //         severity: "error",
+  //       });
+  //     },
+  //   }
+  // );
 
-  useEffect(() => {
-    if (loteNumber) {
-      refetch();
-    }
-  }, [loteNumber, snackbar]);
+  // useEffect(() => {
+  //   if (loteNumber) {
+  //     refetch();
+  //   }
+  // }, [loteNumber, snackbar]);
 
   const detalleCompraMutation = useMutation(detalleCompraAddServices, {
     onSuccess: (response) => {
@@ -137,24 +140,104 @@ const RegisterBuyComponent = ({
   });
 
   const handleSave = () => {
+    setLoteNumber(lote);
     const newBuy = {
+      producto: productoName,
+      proveedor: proveedorName,
       id_proveedor: proveedor,
       id_producto: producto,
+      numero_lote: lote,
       cantidad: cantidad ? cantidad : 0,
       precio_unitario: precio,
       peso: peso ? peso : null,
-      subCantidad: subCantidad * cantidad ? cantidad : 0,
+      subCantidad: subCantidad ? subCantidad * cantidad : 0,
+      cantidadPorCaja: subCantidad > 0 ? subCantidad : null,
+      fecha_ingreso: getLocalDateTime(),
       fecha_compra: getLocalDateTime(),
+      fecha_caducidad: fechaCaducidad,
       id_trabajador: user?.id_trabajador,
     };
-
-    detalleCompraMutation.mutate(newBuy);
+    setRegistroCombinado((prevRegistro) => [...prevRegistro, newBuy]);
+    setLoteNumber(lote);
+    setIsLoteProveedorLocked(true);
+    setFechaIngreso("");
+    setFechaCaducidad("");
+    setCantidad("");
+    setPrecio("");
+    setSubCantidad(null);
+    setPeso("");
+    setDetalleCompraId(null);
+    // detalleCompraMutation.mutate(newBuy);
   };
 
+  const buyMutation = useMutation(buyAddService, {
+    onSuccess: () => {
+      setSnackbar({
+        open: true,
+        message: "Compra realizada exitosamente!",
+        severity: "success",
+      });
+      setIsLoteProveedorLocked(false);
+      setProveedor("");
+      setLote("");
+    },
+    onError: (error) => {
+      setSnackbar({
+        open: true,
+        message: `Error al realizar la compra: ${error.message || "Intenta de nuevo"}`,
+        severity: "error",
+      });
+    },
+  });
+
   const handleFinalize = () => {
+    const transformedArray = registroCombinado.map((item, index) => ({
+      detalleCompraData: {
+        id_proveedor: item.id_proveedor,
+        id_producto: item.id_producto,
+        numero_lote: item.numero_lote,
+        cantidad: item.cantidad,
+        precio_unitario: item.precio_unitario,
+        peso: item.peso,
+        subCantidad: item.subCantidad,
+        cantidadPorCaja: item.cantidadPorCaja,
+        fecha_ingreso: item.fecha_ingreso,
+        fecha_compra: item.fecha_compra,
+        fecha_caducidad: item.fecha_caducidad,
+        id_trabajador: item?.id_trabajador,
+      },
+      loteData: {
+        id_proveedor: item.id_proveedor,
+        id_producto: item.id_producto,
+        numero_lote: item.numero_lote,
+        cantidad: item.cantidad,
+        precio_unitario: item.precio_unitario,
+        peso: item.peso,
+        subCantidad: item.subCantidad,
+        cantidadPorCaja: item.cantidadPorCaja,
+        fecha_ingreso: item.fecha_ingreso,
+        fecha_compra: item.fecha_compra,
+        fecha_caducidad: item.fecha_caducidad,
+        id_trabajador: item?.id_trabajador,
+      },
+      productId: item.id_producto,
+      productUpdateData: {
+        tipo_movimiento: "compra",
+        cantidad: item.cantidad,
+        precio_unitario: item.precio_unitario,
+        fecha_caducidad: item.fecha_caducidad,
+        peso: item.peso,
+        subCantidad: item.subCantidad,
+        cantidadPorCaja: item.cantidadPorCaja,
+        id_trabajador: item.id_trabajador,
+      },
+    }));
+    buyMutation.mutate(transformedArray);
+    console.log("Transformed Array: ", transformedArray);
     setIsLoteProveedorLocked(false);
     setProveedor("");
     setLote("");
+    setRegistroCombinado([]);
   };
 
   return (
@@ -179,6 +262,8 @@ const RegisterBuyComponent = ({
               Registro de Lote
             </Typography>
             <ProductoProveedorForm
+              setProductoName={setProductoName}
+              setProveedorName={setProveedorName}
               proveedor={proveedor}
               setProveedor={setProveedor}
               producto={producto}
@@ -224,6 +309,7 @@ const RegisterBuyComponent = ({
             </Typography>
             <RegistroTableComponent
               registroCombinado={registroCombinado}
+              setRegistroCombinado={setRegistroCombinado}
               handleFinalize={handleFinalize}
               numeroLote={loteNumber}
             />

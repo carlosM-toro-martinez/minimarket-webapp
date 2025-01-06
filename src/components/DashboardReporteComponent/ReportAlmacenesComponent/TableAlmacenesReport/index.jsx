@@ -30,6 +30,7 @@ function Row({ row }) {
       acc + lote.detalleCompra.precio_unitario * lote.detalleCompra.cantidad,
     0
   );
+console.log(row);
 
   return (
     <>

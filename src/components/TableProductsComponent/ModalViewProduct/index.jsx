@@ -143,15 +143,13 @@ function ModalViewProduct({
                     {inventario.peso}
                   </TableCell>
                   <TableCell>
-                    {inventario.fecha_caducidad
-                      .split("T")[0]
+                    {inventario?.fecha_caducidad?.split("T")[0]
                       .split("-")
                       .reverse()
                       .join("/")}
                   </TableCell>
                   <TableCell>
-                    {inventario.fecha_ingreso
-                      .split("T")[0]
+                    {inventario?.fecha_ingreso?.split("T")[0]
                       .split("-")
                       .reverse()
                       .join("/")}

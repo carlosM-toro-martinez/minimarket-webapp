@@ -20,60 +20,66 @@ import { useMutation } from "react-query";
 
 const RegistroTableComponent = ({
   registroCombinado,
+  setRegistroCombinado,
   handleFinalize,
   numeroLote,
 }) => {
+  console.log(registroCombinado);
+  
   const { user } = useContext(MainContext);
 
   const buyLote = registroCombinado;
-  buyLote.sort((a, b) => a.id_lote - b.id_lote);
+  //buyLote.sort((a, b) => a.id_lote - b.id_lote);
 
-  const prevRegistroCombinadoLength = useRef(buyLote.length);
+  //const prevRegistroCombinadoLength = useRef(buyLote.length);
   const navigate = useNavigate();
   const [infoArray, setInfoArray] = useState([]);
 
-  useEffect(() => {
-    const handleUpdate = async () => {
-      if (buyLote.length > prevRegistroCombinadoLength.current) {
-        const data = buyLote[buyLote.length - 1];
+  // useEffect(() => {
+  //   const handleUpdate = async () => {
+  //     if (buyLote.length > prevRegistroCombinadoLength.current) {
+  //       const data = buyLote[buyLote.length - 1];
   
-        const nuevoData = {
-          ...data,
-          tipo_movimiento: "compra",
-          id_trabajador: user?.id_trabajador,
-        };
+  //       const nuevoData = {
+  //         ...data,
+  //         tipo_movimiento: "compra",
+  //         id_trabajador: user?.id_trabajador,
+  //       };
   
-        try {
-          const info = await productoUpdateServices(nuevoData?.producto?.id_producto, nuevoData);
-          setInfoArray((prevInfoArray) => [...prevInfoArray, info]);
-        } catch (error) {
-          console.error("Error al actualizar el producto:", error);
-        }
+  //       try {
+  //         const info = await productoUpdateServices(nuevoData?.producto?.id_producto, nuevoData);
+  //         setInfoArray((prevInfoArray) => [...prevInfoArray, info]);
+  //       } catch (error) {
+  //         console.error("Error al actualizar el producto:", error);
+  //       }
   
-        prevRegistroCombinadoLength.current = buyLote.length;
-      }
-    };
+  //       prevRegistroCombinadoLength.current = buyLote.length;
+  //     }
+  //   };
   
-    handleUpdate(); 
-  }, [registroCombinado, buyLote, user]);
+  //   handleUpdate(); 
+  // }, [registroCombinado, buyLote, user]);
 
   const calcularPrecioTotal = (registro, precioPeso) => {
-    const precioUnitario = parseFloat(registro?.detalleCompra?.precio_unitario);
+    const precioUnitario = parseFloat(registro?.precio_unitario);
 
     if (isNaN(precioUnitario)) {
       return 0;
     }
 
     if (precioPeso) {
+      
       return precioUnitario;
     } else {
-      const cantidad = registro.cantidad;
-      return typeof cantidad === "number" ? cantidad * precioUnitario : 0;
+      const cantidad = registro.cantidad;  
+      
+      return typeof parseInt(cantidad) === "number" ? cantidad * precioUnitario : 0;
     }
   };
+  
 
   const calcularSumaTotal = () => {
-    const total = buyLote.reduce(
+    const total = registroCombinado.reduce(
       (acumulado, registro) =>
         acumulado +
         (registro.cantidad > 0
@@ -87,51 +93,25 @@ const RegistroTableComponent = ({
 
   const handleRoute = () => {
     handleFinalize();
-    navigate("/almacenes");
+    //navigate("/almacenes");
   };
-
-  const mutation = useMutation(
-    ({ id_detalle, data }) => detalleCompraDeleteServices(id_detalle, data),
-    {
-      onSuccess: (_, variables) => {
-        const { index } = variables;
-        buyLote.splice(index, 1);
-        console.log('El registro se eliminó exitosamente.');
-      },
-      onError: (error) => {
-        console.error('Error al eliminar el registro:', error);
-      },
-    }
-  );
   
 
-  const handleDelete = (index, registro) => {
-    console.log(registro);
-    console.log(infoArray);
-    
-    const data = {
-      id_detalle: registro.detalleCompra.id_detalle,
-      id_lote: registro.id_lote,
-      id_inventario: infoArray[index].inventario.id_inventario,
-      id_movimiento: infoArray[index].movimiento.id_movimiento,
-      cantidad: registro.cantidad,
-      subCantidad: registro.subCantidad,
-      peso: registro.peso,
-      id_producto: registro.producto.id_producto,
-    }
-    console.log(data);
-    mutation.mutate({ id_detalle: data.id_detalle, data, index });
-  }
+  const handleDelete = (index) => {
+    const updatedBuyLote = [...registroCombinado]; // Crea una copia del array
+    updatedBuyLote.splice(index, 1); // Elimina el elemento en el índice especificado
+    setRegistroCombinado(updatedBuyLote); // Actualiza el estado con el nuevo array
+  };
 
   return (
     <Box sx={{ width: "93%" }}>
       {numeroLote && (
         <Box sx={{ display: "flex", justifyContent: "space-around" }}>
-          <Typography variant="h6" component="div" gutterBottom>
+          <Typography variant="h6" component="div" gutterBottom style={{textTransform: 'capitalize', fontWeight: 'bold'}}>
             Número de Lote: {numeroLote}
           </Typography>
-          <Typography variant="h6" component="div" gutterBottom>
-            Proveedor: {buyLote[0]?.detalleCompra?.proveedor?.nombre}
+          <Typography variant="h6" component="div" gutterBottom style={{textTransform: 'capitalize', fontWeight: 'bold'}}>
+            Proveedor: {registroCombinado[0]?.proveedor}
           </Typography>
         </Box>
       )}
@@ -155,9 +135,9 @@ const RegistroTableComponent = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {buyLote.map((registro, index) => (
+            {registroCombinado.map((registro, index) => (
               <TableRow key={index}>
-                <TableCell style={{textTransform: 'capitalize'}} >{registro?.producto?.nombre}</TableCell>
+                <TableCell style={{textTransform: 'capitalize'}} >{registro?.producto}</TableCell>
                 <TableCell>
                   {new Date(registro?.fecha_caducidad).toLocaleDateString()}
                 </TableCell>
@@ -173,10 +153,10 @@ const RegistroTableComponent = ({
                   {registro?.detalleCompra?.proveedor?.nombre}
                 </TableCell> */}
                 <TableCell>
-                  {registro?.detalleCompra?.precio_unitario} Bs
+                  {registro?.precio_unitario} Bs
                 </TableCell>
                 <TableCell>
-                  {registro.cantidad > 0
+                  {registro?.cantidad > 0
                     ? calcularPrecioTotal(registro).toFixed(2)
                     : calcularPrecioTotal(registro, true).toFixed(2)}{" "}
                   Bs
@@ -210,9 +190,9 @@ const RegistroTableComponent = ({
           onClick={handleRoute}
           style={{ marginTop: "20px" }}
         >
-          {buyLote.length > 0 ? "Finalizar" : "Cancelar"}
+          {registroCombinado.length > 0 ? "Finalizar" : "Cancelar"}
         </Button>
-        {buyLote.length > 0 ? (
+        {/* {buyLote.length > 0 ? (
           <PDFDownloadLink
             document={
               <PDFReport buyLote={buyLote} sumaTotal={calcularSumaTotal()} />
@@ -227,7 +207,7 @@ const RegistroTableComponent = ({
               Generar Reporte
             </Button>
           </PDFDownloadLink>
-        ) : null}
+        ) : null} */}
       </Box>
     </Box>
   );
