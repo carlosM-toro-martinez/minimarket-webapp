@@ -95,6 +95,10 @@ const RegistroTableComponent = ({
     handleFinalize();
     //navigate("/almacenes");
   };
+
+  const handleCancelar = () => {
+    navigate("/almacenes");
+  }
   
 
   const handleDelete = (index) => {
@@ -187,7 +191,7 @@ const RegistroTableComponent = ({
         <Button
           variant="contained"
           color="primary"
-          onClick={handleRoute}
+          onClick={registroCombinado.length > 0 ? handleRoute : handleCancelar}
           style={{ marginTop: "20px" }}
         >
           {registroCombinado.length > 0 ? "Finalizar" : "Cancelar"}
