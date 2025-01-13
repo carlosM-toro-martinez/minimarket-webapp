@@ -92,7 +92,6 @@ function DashboardVentaComponent({
     cantidadPorUnidad,
     cantidad
   ) => {
-console.log(addProducto);
 
     setProductosSeleccionados((prev) => {
       return [
@@ -455,7 +454,6 @@ console.log(addProducto);
 
   useEffect(() => {
     if (!isProcessing && shouldMutate) {
-      console.log(productosSeleccionados);
       ventaMutation.mutate();
       setShouldMutate(false);
       setPrecio();

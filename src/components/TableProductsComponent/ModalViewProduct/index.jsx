@@ -19,6 +19,7 @@ import productosInventarioService from "../../../async/services/get/productosInv
 import { useMutation, useQuery } from "react-query";
 import { TextField } from "@mui/material";
 import detalleCompraUpdateServices from "../../../async/services/put/detalleCompraUpdateServices";
+import detalleCompraDeleteServices from "../../../async/services/delete/detalleCompraDeleteServices";
 
 function ModalViewProduct({
   handleClose,
@@ -28,8 +29,9 @@ function ModalViewProduct({
   editedPrice,
   setEditedPrice,
   mutate,
+  mutateDelete
 }) {
-  const { data, isLoading, error } = useQuery(
+  const { data, isLoading, error, refetch } = useQuery(
     `InventarioProducts`,
     () => productosInventarioService(product?.id_producto),
     {
@@ -74,7 +76,7 @@ function ModalViewProduct({
     const item = data.inventarios[index].detalleCompra.id_detalle;
 
     if (item && editedPrice) {
-      mutate({ id: item, updatedPrice: parseFloat(editedPrice) }); // Llama a mutate con los datos
+      mutate({ id: item, updatedPrice: parseFloat(editedPrice) });
     }
     setEditingRow(null);
   };
@@ -83,6 +85,24 @@ function ModalViewProduct({
     setEditingRow(null);
     setEditedPrice("");
   };
+
+  const handleDelete = (inventario, index) => {
+    const dataDelete = {
+      id_producto: inventario.detalleCompra.id_producto,
+      id_lote: inventario.id_lote,
+      id_inventario: inventario.id_inventario || null,
+      id_movimiento: inventario.id_movimiento || null,
+      id_detalle: inventario.detalleCompra.id_detalle,
+      cantidad: inventario.cantidad,
+      subCantidad: inventario.subCantidad,
+      peso: parseFloat(inventario.peso) || 0,
+    };
+    console.log(dataDelete);
+    
+    mutateDelete({ dataDelete, idDetalle: inventario.detalleCompra.id_detalle });
+  };
+
+
 
   return (
     <Dialog open={true} onClose={handleClose}>
@@ -116,6 +136,9 @@ function ModalViewProduct({
                 </TableCell>
                 <TableCell style={{ color: "#fff", fontWeight: "bold" }}>
                   Editar precio
+                </TableCell>
+                <TableCell style={{ color: "#fff", fontWeight: "bold" }}>
+                  Eliminar
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -190,6 +213,13 @@ function ModalViewProduct({
                         Editar
                       </Button>
                     )}
+                  </TableCell>
+                  <TableCell>
+                      <Button
+                        onClick={() => handleDelete(inventario, index)}
+                      >
+                        Eliminar
+                      </Button>
                   </TableCell>
                 </TableRow>
               ))}

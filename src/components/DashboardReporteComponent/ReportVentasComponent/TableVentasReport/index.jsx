@@ -25,6 +25,7 @@ import { useMutation } from "react-query";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import anularVentaAddService from "../../../../async/services/post/anularVentaAddService";
 import { getLocalDateTime } from "../../../../utils/getDate";
+import { useNavigate } from "react-router-dom";
 
 function TableVentasReport({ reportData, ventaToday, refetchVentas, caja }) {
   const [utilidades, setUtilidades] = useState([]);
@@ -262,6 +263,7 @@ function TableVentasReport({ reportData, ventaToday, refetchVentas, caja }) {
 }
 
 function VentaRow({ venta, ventaToday, refetchVentas, caja, utilidades }) {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -280,6 +282,7 @@ function VentaRow({ venta, ventaToday, refetchVentas, caja, utilidades }) {
           severity: "success",
         });
         refetchVentas();
+        navigate("/movimiento-caja");
       },
       onError: (error) => {
         setSnackbar({
@@ -292,11 +295,13 @@ function VentaRow({ venta, ventaToday, refetchVentas, caja, utilidades }) {
   );
 
   const handleAnularVenta = (ventaAAnular) => {
+    console.log(ventaAAnular);
+    
     let transformVenta = ventaAAnular.detallesVenta.map((detalle) => ({
       id_producto: detalle.id_producto,
       nombre: detalle.producto.nombre,
       clienteNombre: venta.cliente.nombre,
-      clienteId: ventaAAnular.cliente,
+      clienteId: ventaAAnular.id_cliente,
       id_lote: detalle.id_lote,
       peso: parseFloat(detalle.peso),
       precio: detalle.precio_unitario,
@@ -318,6 +323,7 @@ function VentaRow({ venta, ventaToday, refetchVentas, caja, utilidades }) {
         },
       ];
     }
+console.log(transformVenta);
 
     ventaMutation.mutate(transformVenta);
   };

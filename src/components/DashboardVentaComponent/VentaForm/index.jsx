@@ -75,7 +75,7 @@ const VentaForm = ({
     setLotesProducto(lotesFiltrados);
     setCantLimit(lotesFiltrados[0]?.lote?.producto?.stock);
     setCantUnitLimit(lotesFiltrados[0]?.lote?.producto?.subCantidad);
-    setPesoLimit(lotesFiltrados[0]?.lote?.producto?.peso);
+    setPesoLimit(lotesFiltrados[0]?.lote?.producto?.peso === "NaN" || !lotesFiltrados[0]?.lote?.producto?.peso ? 0 : lotesFiltrados[0]?.lote?.producto?.peso );
 
     setCantidadPorCaja(
       lotesFiltrados[0]?.lote?.cantidadPorCaja
@@ -97,7 +97,7 @@ const VentaForm = ({
           lotesFiltrados,
           cantLimit: lotesFiltrados[0]?.lote?.producto?.stock,
           cantUnitLimit: lotesFiltrados[0]?.lote?.producto?.subCantidad,
-          pesoLimit: lotesFiltrados[0]?.lote?.producto?.peso,
+          pesoLimit: lotesFiltrados[0]?.lote?.producto?.peso === "NaN" || !lotesFiltrados[0]?.lote?.producto?.peso ? 0 : lotesFiltrados[0]?.lote?.producto?.peso,
           cantidadPorCaja: lotesFiltrados[0]?.lote?.cantidadPorCaja || null,
           loteMasAntiguo: loteMasAntiguo,
           peso: lotesFiltrados[0]?.lote?.producto?.peso > 0 ? 1 : null,
@@ -108,7 +108,7 @@ const VentaForm = ({
               : null,
           cantidadPorUnidad:
             lotesFiltrados[0]?.lote?.producto?.subCantidad > 0 &&
-            lotesFiltrados[0]?.lote?.producto?.peso <= 0
+            lotesFiltrados[0]?.lote?.producto?.peso <= 0 || lotesFiltrados[0]?.lote?.producto?.peso === "NaN"
               ? 1
               : null,
           ventaData,

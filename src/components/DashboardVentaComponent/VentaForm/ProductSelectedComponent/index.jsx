@@ -40,6 +40,7 @@ const ProductSelectedComponent = ({
   setMetodoPago,
 }) => {
   const classes = useStyles();
+  
 
   const calcularPrecio = (producto) => {
     if (producto.precioManual) {
@@ -96,12 +97,13 @@ const ProductSelectedComponent = ({
     setProductosDetallados(updatedProductos);
   };
 
-  const handlePriceChange = (index, value) => {
+  const handlePriceChange = (index, value, field, precioUnidad) => {
     const updatedProductos = [...productosDetallados];
 
     updatedProductos[index] = {
       ...updatedProductos[index],
       precioManual: value,
+      [field]: value / precioUnidad,
     };
 
     setProductosDetallados(updatedProductos);
@@ -255,18 +257,20 @@ const ProductSelectedComponent = ({
                 metodosVenta,
                 metodoSeleccionado,
               } = producto;
+              const precioUnidad = producto?.newValue?.inventarios[0]?.lote?.producto?.precio || 0;
+              
               return (
                 <TableRow key={index}>
                   <TableCell>{newValue?.nombre}</TableCell>
                   <TableCell>
-                    {/* {pesoLimit > 0 ? (
+                    {pesoLimit > 0 ? (
                       <>
                         <TextField
                           label="Precio Manual"
                           type="number"
                           value={producto.precioManual || ""}
                           onChange={(e) =>
-                            handlePriceChange(index, parseFloat(e.target.value))
+                            handlePriceChange(index, parseFloat(e.target.value), "peso", precioUnidad)
                           }
                           inputProps={{
                             step: "0.01",
@@ -285,14 +289,14 @@ const ProductSelectedComponent = ({
                               ?.precio}{" "}
                         Bs
                       </>
-                    )} */}
-                                          <>
+                    )}
+                                          {/* <>
                         {metodoSeleccionado
                           ? metodoSeleccionado.precio
                           : newValue?.inventarios[0]?.lote?.producto
                               ?.precio}{" "}
                         Bs
-                      </>
+                      </> */}
                   </TableCell>
 
                   <TableCell>

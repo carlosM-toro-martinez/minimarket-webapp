@@ -102,9 +102,9 @@ const RegistroTableComponent = ({
   
 
   const handleDelete = (index) => {
-    const updatedBuyLote = [...registroCombinado]; // Crea una copia del array
-    updatedBuyLote.splice(index, 1); // Elimina el elemento en el índice especificado
-    setRegistroCombinado(updatedBuyLote); // Actualiza el estado con el nuevo array
+    const updatedBuyLote = [...registroCombinado];
+    updatedBuyLote.splice(index, 1); 
+    setRegistroCombinado(updatedBuyLote);
   };
 
   return (

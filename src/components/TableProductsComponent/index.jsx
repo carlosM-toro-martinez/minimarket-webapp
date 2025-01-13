@@ -22,6 +22,7 @@ import useStyles from "./table.styles";
 import productoDeleteServices from "../../async/services/delete/productoDeleteServices";
 import { useMutation } from "react-query";
 import detalleCompraUpdateServices from "../../async/services/put/detalleCompraUpdateServices";
+import detalleCompraDeleteServices from "../../async/services/delete/detalleCompraDeleteServices";
 
 const ITEM_HEIGHT = 48;
 
@@ -106,6 +107,22 @@ export default function TableProductsComponent({ productos, refetchProducts }) {
           "Error al actualizar el detalle de compra:",
           error.message
         );
+      },
+    }
+  );
+
+  const { mutate: mutateDelete, isLoading: loading, isError } = useMutation(
+    async ({ dataDelete, idDetalle }) => {
+      return await detalleCompraDeleteServices(idDetalle, dataDelete);
+    },
+    {
+      onSuccess: (response) => {
+        console.log('Mutación exitosa:', response);
+        refetchProducts();
+        handleCloseModals();
+      },
+      onError: (error) => {
+        console.error('Error en la mutación:', error);
       },
     }
   );
@@ -251,6 +268,7 @@ export default function TableProductsComponent({ productos, refetchProducts }) {
           editedPrice={editedPrice}
           setEditedPrice={setEditedPrice}
           mutate={mutate}
+          mutateDelete={mutateDelete}
         />
       )}
     </Box>
