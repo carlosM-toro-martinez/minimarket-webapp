@@ -39,7 +39,6 @@ function TableVentasReport({ reportData, ventaToday, refetchVentas, caja }) {
 
   const calcularUtilidades = (ventas) => {
     let totalGlobalUtilidad = 0;
-    console.log(ventas);
     const resultados = ventas.map((venta) => {
       let utilidadVenta = 0;
       const detallesConUtilidad = [];
@@ -53,12 +52,19 @@ function TableVentasReport({ reportData, ventaToday, refetchVentas, caja }) {
           precioCompraPorUnidad =
             parseFloat(detalleCompra.precio_unitario) / lote.cantidadPorCaja;
         } else if (lote.peso && lote.peso > 0) {
-          precioCompraPorUnidad =
-            parseFloat(detalleCompra.precio_unitario) / lote.peso;
+          if (detalle.peso < 1) {
+            precioCompraPorUnidad =
+              parseFloat(detalleCompra.precio_unitario) / parseFloat(lote.peso);
+            precioCompraPorUnidad =
+              precioCompraPorUnidad * parseFloat(detalle.peso);
+            console.log(precioCompraPorUnidad);
+          } else {
+            precioCompraPorUnidad =
+              parseFloat(detalleCompra.precio_unitario) / lote.peso;
+          }
         } else {
           precioCompraPorUnidad = parseFloat(detalleCompra.precio_unitario);
         }
-        console.log(detalle);
 
         const cantidadVendida =
           detalle.subCantidad > 0
@@ -70,15 +76,17 @@ function TableVentasReport({ reportData, ventaToday, refetchVentas, caja }) {
             : 0;
 
         const utilidadDetalle =
-          cantidadVendida *
-          (parseFloat(detalle.precio_unitario) - precioCompraPorUnidad);
+          cantidadVendida < 1
+            ? parseFloat(detalle.precio_unitario) - precioCompraPorUnidad
+            : cantidadVendida *
+              (parseFloat(detalle.precio_unitario) - precioCompraPorUnidad);
 
         utilidadVenta += utilidadDetalle;
 
         detallesConUtilidad.push({
           producto: detalle.producto || "Producto desconocido",
           cantidadVendida,
-          precioCompraPorUnidad: precioCompraPorUnidad.toFixed(2),
+          precioCompraPorUnidad: precioCompraPorUnidad?.toFixed(2),
           precioVentaPorUnidad: parseFloat(detalle.precio_unitario).toFixed(2),
           utilidadDetalle: utilidadDetalle.toFixed(2),
         });
@@ -295,8 +303,6 @@ function VentaRow({ venta, ventaToday, refetchVentas, caja, utilidades }) {
   );
 
   const handleAnularVenta = (ventaAAnular) => {
-    console.log(ventaAAnular);
-    
     let transformVenta = ventaAAnular.detallesVenta.map((detalle) => ({
       id_producto: detalle.id_producto,
       nombre: detalle.producto.nombre,
@@ -323,7 +329,6 @@ function VentaRow({ venta, ventaToday, refetchVentas, caja, utilidades }) {
         },
       ];
     }
-console.log(transformVenta);
 
     ventaMutation.mutate(transformVenta);
   };

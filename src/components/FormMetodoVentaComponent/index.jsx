@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { TextField, Button, Grid, Snackbar, Autocomplete } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Grid,
+  Snackbar,
+  Autocomplete,
+  Checkbox,
+  FormControlLabel,
+  MenuItem,
+} from "@mui/material";
 import { useMutation } from "react-query";
 import Alert from "@mui/material/Alert";
 import useStyles from "./formMetodoVenta.styles";
@@ -11,9 +20,11 @@ function FormMetodoVenta({ handleClose, refetchMetodoVentas, productos }) {
   const [descripcion, setDescripcion] = useState("");
   const [cantidadPorMetodo, setCantidadPorMetodo] = useState();
   const [precio, setPrecio] = useState();
-  const [pesoPorMetodo, setPesoPorMetodo] = useState(); // Nuevo campo
+  const [pesoPorMetodo, setPesoPorMetodo] = useState();
+  const [unidadVenta, setUnidadVenta] = useState("");
   const [selectedProduct, setSelectedProduct] = useState(null);
 
+  const [selectedOption, setSelectedOption] = useState("");
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -33,11 +44,13 @@ function FormMetodoVenta({ handleClose, refetchMetodoVentas, productos }) {
       });
       setCantidadPorMetodo();
       setPrecio();
-      setPesoPorMetodo(); // Reiniciar peso
+      setPesoPorMetodo();
+      setUnidadVenta("");
       setDescripcion("");
       setSelectedProduct(null);
+      setSelectedOption("");
       refetchMetodoVentas();
-      handleClose(); // Cerrar el diálogo
+      handleClose();
     },
     onError: (error) => {
       setSnackbar({
@@ -48,14 +61,26 @@ function FormMetodoVenta({ handleClose, refetchMetodoVentas, productos }) {
     },
   });
 
+  const handleCheckboxChange = (option) => {
+    setSelectedOption(option);
+    setCantidadPorMetodo();
+    setPrecio();
+    setPesoPorMetodo();
+    setUnidadVenta("");
+    setDescripcion("");
+    setSelectedProduct(null);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (selectedProduct) {
       const data = {
         descripcion,
-        cantidad_por_metodo: cantidadPorMetodo,
+        cantidad_por_metodo:
+          selectedOption === "cantidad" ? cantidadPorMetodo : null,
         precio,
-        peso_por_metodo: pesoPorMetodo || null, // Enviar null si no hay valor
+        peso_por_metodo: selectedOption === "peso" ? pesoPorMetodo : null,
+        unidad_venta: selectedOption === "peso_por_unidad" ? unidadVenta : null,
         id_producto: selectedProduct.id_producto,
       };
       mutation.mutate(data);
@@ -66,6 +91,22 @@ function FormMetodoVenta({ handleClose, refetchMetodoVentas, productos }) {
         severity: "error",
       });
     }
+  };
+
+  const conversionRates = {
+    kilogramo: 1,
+    libra: 0.453592,
+    cuartilla: 2.875575,
+    onza: 0.0283495,
+    arroba: 11.5,
+    quintal: 50,
+  };
+
+  const handleUnidadVentaChange = (selectedUnit) => {
+    setUnidadVenta(selectedUnit);
+    const conversion = conversionRates[selectedUnit] || 0;
+    setDescripcion(selectedUnit);
+    setPesoPorMetodo(conversion.toFixed(2));
   };
 
   return (
@@ -103,39 +144,90 @@ function FormMetodoVenta({ handleClose, refetchMetodoVentas, productos }) {
             />
           </Grid>
           <Grid item xs={12}>
-            <TextField
-              label="Cantidad por Método"
-              variant="outlined"
-              value={cantidadPorMetodo}
-              onChange={(e) => setCantidadPorMetodo(e.target.value)}
-              fullWidth
-              className={classes.input}
-              type="number"
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={selectedOption === "peso"}
+                  onChange={() => handleCheckboxChange("peso")}
+                />
+              }
+              label="Peso"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={selectedOption === "cantidad"}
+                  onChange={() => handleCheckboxChange("cantidad")}
+                />
+              }
+              label="Cantidad"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={selectedOption === "peso_por_unidad"}
+                  onChange={() => handleCheckboxChange("peso_por_unidad")}
+                />
+              }
+              label="Peso por Unidad"
             />
           </Grid>
-          <Grid item xs={12}>
-            <TextField
-              label="Precio"
-              variant="outlined"
-              value={precio}
-              onChange={(e) => setPrecio(e.target.value)}
-              fullWidth
-              required
-              className={classes.input}
-              type="number"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              label="Peso por Método"
-              variant="outlined"
-              value={pesoPorMetodo}
-              onChange={(e) => setPesoPorMetodo(e.target.value)}
-              fullWidth
-              className={classes.input}
-              type="number"
-            />
-          </Grid>
+
+          {selectedOption === "peso" && (
+            <Grid item xs={12}>
+              <TextField
+                label="Peso por Método"
+                variant="outlined"
+                value={pesoPorMetodo}
+                onChange={(e) => setPesoPorMetodo(e.target.value)}
+                fullWidth
+                className={classes.input}
+                type="number"
+              />
+            </Grid>
+          )}
+
+          {selectedOption === "cantidad" && (
+            <Grid item xs={12}>
+              <TextField
+                label="Cantidad por Método"
+                variant="outlined"
+                value={cantidadPorMetodo}
+                onChange={(e) => setCantidadPorMetodo(e.target.value)}
+                fullWidth
+                className={classes.input}
+                type="number"
+              />
+            </Grid>
+          )}
+
+          {selectedOption === "peso_por_unidad" && (
+            <Grid item xs={12}>
+              <TextField
+                select
+                label="Unidad de Venta"
+                value={unidadVenta}
+                onChange={(e) => handleUnidadVentaChange(e.target.value)}
+                fullWidth
+                className={classes.input}
+                required
+              >
+                {[
+                  "kilogramo",
+                  "libra",
+                  "cuartilla",
+                  "onza",
+                  "arroba",
+                  "quintal",
+                ].map((unidad) => (
+                  <MenuItem key={unidad} value={unidad}>
+                    {unidad}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+          )}
+
           <Grid item xs={6}>
             <Button
               variant="contained"

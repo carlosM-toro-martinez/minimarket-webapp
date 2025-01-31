@@ -30,7 +30,7 @@ export default function TableProductsComponent({ productos, refetchProducts }) {
   const classes = useStyles();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [searchQuery, setSearchQuery] = useState(""); // Estado para búsqueda
+  const [searchQuery, setSearchQuery] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
@@ -38,7 +38,7 @@ export default function TableProductsComponent({ productos, refetchProducts }) {
   const [openViewModal, setOpenViewModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedidProducto, setSelectedIdProduct] = useState(null);
-  const [editingRow, setEditingRow] = useState(null); // Para rastrear la fila en edición
+  const [editingRow, setEditingRow] = useState(null);
   const [editedPrice, setEditedPrice] = useState("");
 
   const handleClick = (event) => {
@@ -111,18 +111,22 @@ export default function TableProductsComponent({ productos, refetchProducts }) {
     }
   );
 
-  const { mutate: mutateDelete, isLoading: loading, isError } = useMutation(
+  const {
+    mutate: mutateDelete,
+    isLoading: loading,
+    isError,
+  } = useMutation(
     async ({ dataDelete, idDetalle }) => {
       return await detalleCompraDeleteServices(idDetalle, dataDelete);
     },
     {
       onSuccess: (response) => {
-        console.log('Mutación exitosa:', response);
+        console.log("Mutación exitosa:", response);
         refetchProducts();
         handleCloseModals();
       },
       onError: (error) => {
-        console.error('Error en la mutación:', error);
+        console.error("Error en la mutación:", error);
       },
     }
   );
