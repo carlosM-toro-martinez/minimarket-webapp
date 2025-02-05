@@ -68,7 +68,6 @@ function FormMetodoVenta({ handleClose, refetchMetodoVentas, productos }) {
     setPesoPorMetodo();
     setUnidadVenta("");
     setDescripcion("");
-    setSelectedProduct(null);
   };
 
   const handleSubmit = (e) => {
@@ -77,9 +76,12 @@ function FormMetodoVenta({ handleClose, refetchMetodoVentas, productos }) {
       const data = {
         descripcion,
         cantidad_por_metodo:
-          selectedOption === "cantidad" ? cantidadPorMetodo : null,
+          selectedOption === "cantidad" ? cantidadPorMetodo : 0,
         precio,
-        peso_por_metodo: selectedOption === "peso" ? pesoPorMetodo : null,
+        peso_por_metodo:
+          selectedOption === "peso_por_unidad"
+            ? parseFloat(pesoPorMetodo)
+            : null,
         unidad_venta: selectedOption === "peso_por_unidad" ? unidadVenta : null,
         id_producto: selectedProduct.id_producto,
       };
@@ -96,9 +98,9 @@ function FormMetodoVenta({ handleClose, refetchMetodoVentas, productos }) {
   const conversionRates = {
     kilogramo: 1,
     libra: 0.453592,
-    cuartilla: 2.875575,
+    cuartilla: 2.835,
     onza: 0.0283495,
-    arroba: 11.5,
+    arroba: 11.34,
     quintal: 50,
   };
 
@@ -106,7 +108,7 @@ function FormMetodoVenta({ handleClose, refetchMetodoVentas, productos }) {
     setUnidadVenta(selectedUnit);
     const conversion = conversionRates[selectedUnit] || 0;
     setDescripcion(selectedUnit);
-    setPesoPorMetodo(conversion.toFixed(2));
+    setPesoPorMetodo(parseFloat(conversion.toFixed(2)));
   };
 
   return (
@@ -141,6 +143,18 @@ function FormMetodoVenta({ handleClose, refetchMetodoVentas, productos }) {
               fullWidth
               required
               className={classes.input}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="Precio"
+              variant="outlined"
+              value={precio}
+              onChange={(e) => setPrecio(e.target.value)}
+              fullWidth
+              required
+              className={classes.input}
+              type="number"
             />
           </Grid>
           <Grid item xs={12}>

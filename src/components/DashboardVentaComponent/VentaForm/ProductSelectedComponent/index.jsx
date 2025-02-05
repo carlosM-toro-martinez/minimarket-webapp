@@ -40,7 +40,6 @@ const ProductSelectedComponent = ({
   setMetodoPago,
 }) => {
   const classes = useStyles();
-  
 
   const calcularPrecio = (producto) => {
     if (producto.precioManual) {
@@ -54,8 +53,8 @@ const ProductSelectedComponent = ({
 
   const calcularCantidadActiva = (producto) => {
     if (producto.metodoSeleccionado) {
-      if (producto.pesoMetodo) {
-        return producto.pesoMetodo || 0;
+      if (producto.pesoMetodoCantidad) {
+        return producto.pesoMetodoCantidad || 0;
       }
       return producto.cantidadMetodo || 0;
     }
@@ -85,14 +84,27 @@ const ProductSelectedComponent = ({
     setTotalPrice(total);
   }, [productosDetallados, setTotalPrice]);
 
-  const handleInputChange = (index, field, value, maxValue) => {
+  const handleInputChange = (
+    index,
+    field,
+    value,
+    maxValue,
+    peso_por_metodo
+  ) => {
     const newValue = Math.min(value, maxValue);
-
     const updatedProductos = [...productosDetallados];
-    updatedProductos[index] = {
-      ...updatedProductos[index],
-      [field]: typeof value === "number" ? newValue : value,
-    };
+    if (peso_por_metodo) {
+      updatedProductos[index] = {
+        ...updatedProductos[index],
+        [field]: typeof value === "number" ? newValue : value,
+        pesoMetodo: newValue * peso_por_metodo,
+      };
+    } else {
+      updatedProductos[index] = {
+        ...updatedProductos[index],
+        [field]: typeof value === "number" ? newValue : value,
+      };
+    }
 
     setProductosDetallados(updatedProductos);
   };
@@ -151,16 +163,16 @@ const ProductSelectedComponent = ({
 
   return (
     <TableContainer component={Paper}>
-      <TableRow sx={{ width: '100%', display: 'flex' }}>
+      <TableRow sx={{ width: "100%", display: "flex" }}>
         <TableCell
           sx={{
             fontWeight: "bold",
             color: "#000",
             fontSize: "1.2rem",
             textTransform: "capitalize",
-            display: 'flex',
+            display: "flex",
             flex: 1,
-            justifyContent: 'center',
+            justifyContent: "center",
           }}
           colSpan={2}
         >
@@ -177,11 +189,11 @@ const ProductSelectedComponent = ({
             fontWeight: "bold",
             color: "#000",
             fontSize: "1.2rem",
-            display: 'flex',
-            flex: 1, // Para asegurar que la celda se expanda igualmente
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
+            display: "flex",
+            flex: 1,
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
           }}
           colSpan={2}
         >
@@ -195,10 +207,10 @@ const ProductSelectedComponent = ({
             fontWeight: "bold",
             color: "#000",
             fontSize: "1.2rem",
-            display: 'flex',
-            flex: 1, // Para que se ajuste el tamaño de la celda
-            justifyContent: 'center',
-            alignItems: 'center',
+            display: "flex",
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
           }}
           colSpan={2}
         >
@@ -212,11 +224,13 @@ const ProductSelectedComponent = ({
         </TableCell>
       </TableRow>
 
-      <Table style={{
-        maxHeight: "70vh", 
-        overflowY: "auto",
-        display: 'block'
-      }}>
+      <Table
+        style={{
+          maxHeight: "70vh",
+          overflowY: "auto",
+          display: "block",
+        }}
+      >
         <TableHead>
           <TableRow
             className={classes.tableHeader}
@@ -244,11 +258,10 @@ const ProductSelectedComponent = ({
             ))}
           </TableRow>
         </TableHead>
-        <TableBody >
+        <TableBody>
           {Array.isArray(productosDetallados) &&
             productosDetallados?.length > 0 &&
-            productosDetallados
-            ?.map((producto, index) => {
+            productosDetallados?.map((producto, index) => {
               const {
                 cantLimit,
                 cantUnitLimit,
@@ -257,20 +270,28 @@ const ProductSelectedComponent = ({
                 metodosVenta,
                 metodoSeleccionado,
               } = producto;
-              const precioUnidad = producto?.newValue?.inventarios[0]?.lote?.producto?.precio || 0;
-              
+              const precioUnidad =
+                producto?.newValue?.inventarios[0]?.lote?.producto?.precio || 0;
+
               return (
                 <TableRow key={index}>
-                  <TableCell>{newValue?.nombre}</TableCell>
+                  <TableCell sx={{ textTransform: "capitalize" }}>
+                    {newValue?.nombre}
+                  </TableCell>
                   <TableCell>
-                    {pesoLimit > 0 ? (
+                    {pesoLimit > 0 && !metodoSeleccionado ? (
                       <>
                         <TextField
                           label="Precio Manual"
                           type="number"
                           value={producto.precioManual || ""}
                           onChange={(e) =>
-                            handlePriceChange(index, parseFloat(e.target.value), "peso", precioUnidad)
+                            handlePriceChange(
+                              index,
+                              parseFloat(e.target.value),
+                              "peso",
+                              precioUnidad
+                            )
                           }
                           inputProps={{
                             step: "0.01",
@@ -290,7 +311,7 @@ const ProductSelectedComponent = ({
                         Bs
                       </>
                     )}
-                                          {/* <>
+                    {/* <>
                         {metodoSeleccionado
                           ? metodoSeleccionado.precio
                           : newValue?.inventarios[0]?.lote?.producto
@@ -307,13 +328,17 @@ const ProductSelectedComponent = ({
                             <TextField
                               label="Peso por metodo"
                               type="number"
-                              value={producto.pesoMetodo || ""}
+                              value={producto.pesoMetodoCantidad || ""}
                               onChange={(e) =>
                                 handleInputChange(
                                   index,
-                                  "pesoMetodo",
+                                  "pesoMetodoCantidad",
                                   parseFloat(e.target.value),
-                                  pesoLimit
+                                  Math.trunc(
+                                    pesoLimit /
+                                      metodoSeleccionado?.peso_por_metodo
+                                  ),
+                                  metodoSeleccionado?.peso_por_metodo
                                 )
                               }
                               inputProps={
@@ -325,7 +350,11 @@ const ProductSelectedComponent = ({
                               fullWidth
                             />
                             <Typography variant="caption" color="textSecondary">
-                              Máximo: {pesoLimit} Kg
+                              Max:{" "}
+                              {Math.trunc(
+                                pesoLimit / metodoSeleccionado?.peso_por_metodo
+                              )}{" "}
+                              {metodoSeleccionado?.descripcion}s
                             </Typography>
                           </>
                         ) : (
@@ -349,7 +378,7 @@ const ProductSelectedComponent = ({
                               fullWidth
                             />
                             <Typography variant="caption" color="textSecondary">
-                              Máximo: {pesoLimit} Kg
+                              Max: {pesoLimit} Kg
                             </Typography>
                           </>
                         )}
@@ -378,7 +407,7 @@ const ProductSelectedComponent = ({
                           fullWidth
                         />
                         <Typography variant="caption" color="textSecondary">
-                          Máximo: {cantLimit}
+                          Max: {cantLimit}
                         </Typography>
                       </>
                     )}
@@ -411,7 +440,7 @@ const ProductSelectedComponent = ({
                               fullWidth
                             />
                             <Typography variant="caption" color="textSecondary">
-                              Máximo:{" "}
+                              Max:{" "}
                               {Math.trunc(
                                 cantUnitLimit /
                                   metodoSeleccionado?.cantidad_por_metodo
@@ -438,7 +467,7 @@ const ProductSelectedComponent = ({
                               fullWidth
                             />
                             <Typography variant="caption" color="textSecondary">
-                              Máximo: {cantUnitLimit} u
+                              Max: {cantUnitLimit} u
                             </Typography>
                           </>
                         )}
@@ -470,7 +499,7 @@ const ProductSelectedComponent = ({
                           ))}
                         </Select>
                         <Typography variant="caption" color="textSecondary">
-                          Máximo: {cantLimit} cajas
+                          Max: {cantLimit} cajas
                         </Typography>
                       </FormControl>
                     ) : null}
@@ -486,33 +515,27 @@ const ProductSelectedComponent = ({
         </TableBody>
       </Table>
       <TableRow>
-            <TableCell
-              sx={{ fontWeight: "bold", fontSize: "2rem" }}
-              colSpan={1}
-            >
-              Total
-            </TableCell>
-            <TableCell
-              sx={{ fontWeight: "bold", fontSize: "2rem" }}
-              colSpan={3}
-            >
-              {calcularSumaTotal()} Bs
-            </TableCell>
-            <TableCell sx={{ fontWeight: "bold" }} colSpan={1}>
-              <Button
-                variant="contained"
-                style={{
-                  backgroundColor: "red",
-                  color: "#fff",
-                  fontWeight: "bold",
-                  width: "10rem",
-                }}
-                fullWidth
-                onClick={handleCancelar}
-              >
-                Cancelar
-              </Button>
-            </TableCell>
+        <TableCell sx={{ fontWeight: "bold", fontSize: "2rem" }} colSpan={1}>
+          Total
+        </TableCell>
+        <TableCell sx={{ fontWeight: "bold", fontSize: "2rem" }} colSpan={3}>
+          {calcularSumaTotal()} Bs
+        </TableCell>
+        <TableCell sx={{ fontWeight: "bold" }} colSpan={1}>
+          <Button
+            variant="contained"
+            style={{
+              backgroundColor: "red",
+              color: "#fff",
+              fontWeight: "bold",
+              width: "10rem",
+            }}
+            fullWidth
+            onClick={handleCancelar}
+          >
+            Cancelar
+          </Button>
+        </TableCell>
       </TableRow>
     </TableContainer>
   );
